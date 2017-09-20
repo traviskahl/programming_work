@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "$# args"
+
+filename=$1
+shorter=${filename%.cpp}
+
+echo "shorter should be $shorter"
+
+for i in "$@"
+do
+	files+=$i
+	files+=" "
+done
+
+echo "files should be $files"

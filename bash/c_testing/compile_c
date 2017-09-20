@@ -1,0 +1,17 @@
+#!/bin/bash
+# this program is just for easy compilation of GNU C++ programs using my custom settings.
+# last updated on 10 July, 2017
+
+filename=$1
+shorter=${filename%.cpp}
+
+for i in "$@"; do
+	files+=$i
+	files+=" "
+done
+
+if g++ -Wall -std=c++17 $files -o $shorter; then
+	echo "$filename was compiled into $shorter"
+else
+	echo "compilation failed."
+fi

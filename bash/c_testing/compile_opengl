@@ -1,0 +1,17 @@
+#!/bin/bash
+# this is just for making openGL programs faster
+# last updated on 11 August, 2017 by Travis Kahl
+
+filename=$1
+shorter=${filename%.cpp}
+
+for i in "$@"; do
+	files+=$i
+	files+=" "
+done
+
+if g++ -Wall -std=c++17 $files -o $shorter -lGL -lGLU -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor -ldl; then
+	echo "$filename was compiled into $shorter"
+else
+	echo "compilation failed."
+fi
