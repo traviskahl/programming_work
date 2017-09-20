@@ -1,0 +1,78 @@
+function overloading allows us to create functions with the same name
+as long as each function has a unique signature
+lets us create variations of a function to work with different data types without making new names
+
+in c++ operators are implemented as functions
+by overloading the operator functions we can define our own versions that work with different data types
+this is called operator overloading
+
+consider this example
+
+	int x = 1;
+	int y = 2;
+	std::cout << x + y << '\n';
+
+compiler comes with a version of operator+ for integers
+adds integers together and returns an integer
+
+	double x = 1.1;
+	double y = 2.2;
+	std::cout << x + y << '\n';
+
+compiler also has a version of operator+ for doubles
+adds doubles together and returns a double
+
+	MyString string1 = "Hello, ";
+	MyString string2 = "World!";
+	std::cout << string1 + string2 << '\n';
+
+what do we expect to happen here?
+we expect it to print "Hello, world!" but compiler doesn't know that
+it doesn't have any version of operator+ for class MyString so it throws an error
+we'd need to write an overloaded function to make it work
+
+when evaluating an expression with an operator, compiler uses these rules:
+	if all operands are fundamental data types, compiler calls a built-in function if one exists
+		if one doesn't exist, produces a compiler error
+	if any operands are user data types, compiler looks to see if type has a matching overloaded operator
+		if it can't find one it tries to convert one user type into a fundamental type to call a built-in operator
+		if that fails, produces a compiler error
+
+almost any operator can be overloaded
+exceptions are:
+	conditional (?)
+	sizeof
+	scope resolution (::)
+	member selector (.)
+	pointer member selector (.*)
+
+can only overload operators that exist
+couldn't create a new operator or rename existing ones
+can't create a new operator** for exponents
+
+at least one operand must be a user-defined type
+couldn't overload operator+ to work with one int and one double
+but can overload operator+ to work with one int and one MyString
+
+not possible to change number of operands an operator takes
+
+all operators keep default precedence and associativity
+can't change this at all
+
+some new programmers overload operator^ to do exponents
+but operator^ has a lower precedence than mathematical operators
+and this causes expressions to be evaluated incorrectly
+would need to parenthesize exponent every single time it was used
+this isn't intuitive, especially to people who didn't write the function
+can potentially create many errors
+therefore it's a good idea to use operators similarly to their original intent
+
+Rule: when overloading operators, it's best to keep the function of the operators as close to
+	the original intent of the operators as possible
+
+since operators don't have descriptive names it's not always clear what they're supposed to do
+operator+ might make sense for a string class to do concatenation
+but what would operator- do? it's not really clear
+
+Rule: if the meaning of the operator when applied to a custom class is not clear and intuitive,
+	use a named function instead

@@ -1,0 +1,174 @@
+to get realism we need to use textures
+texture: a 2D image used to add detail to an object
+it's like a piece of paper with an image on it, folded over a 3D object
+we give the illusion of detail without needing lots of vertices
+
+to map a texture to a triangle we need to tell each vertex which part of the triangle it corresponds to
+so each vertex needs a texture coordinate that associates with a texture image
+then fragment interpolation takes over
+
+texture coordinates range from 0 to 1 in both x and y
+getting a texture color using texture coordinates is called sampling
+texture coords start at (0, 0) in the bottom left
+go to (1, 1) in the top right
+
+for a triangle we need 3 texture coord points
+bottom left, bottom right, and top center
+texture sampling has a loose interpretation
+so we should tell opengl how to sample the textures
+
+what happens if we specify coords outside the valid range?
+opengl defaults to repeating the texture image
+but there's other options it offers
+
+	GL_REPEAT:			default behavior, repeats texture image
+	GL_MIRRORED_REPEAT	same as GL_REPEAT but mirrors the image on each repeat
+	GL_CLAMP_TO_EDGE	clamps coords between 0 and 1
+						so higher coords are clamped to edge and gives a stretched pattern
+	GL_CLAMP_TO_BORDER	coords outside the range are set to a border color
+
+each can be set per coordinate axis (s, t, or r when in 3D)
+they're the same as x, y, and z
+use the glTexParameter*() function
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+
+first arg specifies texture target
+	we're working with 2D so that's the target
+second tells what option we want, and what texture axis
+	here it configures the texture wrap setting for the s axis
+last arg passes in the mode we want and opengl sets it for us
+if we choose GL_CLAMP_TO_BORDER we should specify a border color
+done using glTexParameterfv
+
+	float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+texture coords don't rely on resolution, can be any floating point falue
+so opengl has to figure out which texture pixel (texel) to map the texture coord to
+very important with a large object and low resolution
+opengl has options for this texture filtering too
+several options but the most important are GL_NEAREST and GL_LINEAR
+
+GL_NEAREST is sometimes called nearest neighbor filtering
+it's the default in opengl
+opengl selects the pixel whose center is closest to the texture coord
+
+GL_LINEAR is sometimes called bilinear filtering
+takes an interpolated value from the texture coords neighboring texels
+then approximates a color between them
+the smaller the distance the more the texel contributes to the color
+
+GL_NEAREST gives blocky patterns where we can see pixels
+GL_LINEAR has a smoother pattern where individual pixels are less visible
+
+texture filtering can be set for magnifying and minifying operations
+basically upscaling or downscaling
+we could use nearest for downscaling and linear for upscaling
+like wrapping settings, use glTexParameteri()
+
+imagine having a large room with thousands of objects that all have textures
+far objects would have the same high-res texture as near objects
+opengl has trouble getting the right color since there's only a few fragments
+there'll be visible artifacts and memory waste for having high-res textures on tiny objects
+
+opengl uses mipmaps, basically collections of texture images that are downscaled
+each subsequent texture is half as large as the one before
+after a certain distance opengl uses a different mipmap texture to better suit the distance
+if it's far, it uses a smaller texture and isn't noticable to the user
+they're also good for performance
+creating mipmaps sucks for us to do, but opengl does it for us
+just call glGenerateMipmaps() and we're good
+
+when switching between mipmap levels there might be artifacts
+but we can filter between mipmap levels using NEAREST and LINEAR filtering
+we replace original filtering methods with one of these:
+
+	GL_NEAREST_MIPMAP_NEAREST	takes nearest mipmap to match pixel size and use nearest neighbor for sampling
+	GL_LINEAR_MIPMAP_NEAREST	uses linear for mipmaps and sampling
+	GL_NEAREST_MIPMAP_LINEAR	uses nearest for mipmaps and linear for sampling
+	GL_LINEAR_MIPMAP_LINEAR		uses linear for mipmaps and sampling
+
+don't use one of these for mag filter
+doesn't have any effect since mipmaps are used for downscaling
+throws a GL_INVALID_ENUM error
+
+to use textures, we need to load them into our application
+can be stored in many formats with different structure and order of data
+how can we get them into our application?
+best solution right now is to use someone else's library
+
+to load using stb_image.h, use stbi_load()
+	
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("path_to_image", &width, &height, &nrChannels, 0);
+
+textures are referenced by IDs like everything else in opengl
+use glGenTextures()
+we need to bind it with glBindTexture()
+now we can generate the texture itself using glTexImage2D()
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+there's a few args:
+
+	1. texture target
+	2. mipmap level we're creating the texture for
+	3. what format we're storing the texture in
+	4. width of texture
+	5. height of texture
+	6. always should be 0 (legacy reasons)
+	7. format of source image
+	8. datatype of source image
+	9. actual image data
+
+once that function is called we should generate mipmaps
+then it's good practice to free the image memory
+
+we need to update vertex data to have texture coords
+also notify opengl of new format
+change stride and add new vertex attrib pointer
+also alter vertex shader to accept texture coords
+
+fragment shader should also have access to texture object
+but how can we pass it to fragment shader?
+glsl has data type for texture objects called a sampler
+add texture to fragment shader by declaring a uniform sampler2D
+
+to sample the color of a texture we use the texture() function
+first arg is a texture sampler
+second arg is corresponding texture coord
+then samples the corresponding color value and outputs the filtered color of the texture
+then just bind the texture before calling glDrawElements
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+then we're good to go
+
+so the sampler2D is a uniform but we didn't assign it a value
+with glUniform1i we can assign a location value to the texture sampler
+so we can set multiple textures at once in a fragment shader
+location of a texture is commonly known as a texture unit
+default is 0, which is the default active texture unit
+so we didn't need to assign it
+
+texture units let us use more than one texture in our shaders
+by assigning texture units to the samplers we can bind multiple textures
+as long as we activate it first
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+so a call to glBindTexture() sets the currently active texture unit to the texture
+but we need to make sure the fragment shader can accept another sampler
+then load another texture
+then bind the textures to a texture unit
+finally set samplers using our setInt() function
+
+the texture will be flipped upside down
+because opengl expects the 0.0 coord of the y-axis to be on the bottom
+but images usually have it on top of the y-axis
+we can set it to flip vertically though

@@ -1,0 +1,64 @@
+operators can also be overloaded as member functions
+it's similar to overloading operators using a friend function
+when overloading using a member function:
+	the overloaded operator must be added as a member function of the left operand
+	left operand becomes the implicit *this object
+	other operands become function parameters
+
+converting a friend function to a member overloaded operator is easy:
+	overloaded operator is defined as a member, not a friend
+	left parameter is removed, becomes the implicit *this object
+	inside function body, all references to left parameter can be removed
+
+EX: simple.cpp
+
+usage of operator doesn't change at all
+we just defined the operator differently
+two-parameter friend function becomes a one-parameter member function
+leftmost parameter in friend version becomes the implicit *this operator
+
+how does cents1 + 2 evaluate?
+in friend function version, expression cents1 + 2 becomes operator+(cents1, 2)
+there's two function parameters
+
+in member function version, expression cents1 + 2 becomes cents1.operator+(2);
+there's only one explicit parameter and cents1 becomes an object prefix
+but object parameter is actually a hidden leftmost parameter *this
+so really cents1.operator+(2) is operator+(&cents1, 2)
+
+both produce the same result
+so if both ways are functionally the same, which should we use?
+
+operator=, operator[], operator(), and operator-> must be overloaded as member functions
+c++ requires this
+
+operator<< can't be a member function
+overloaded operator must be added as a member of the left-hand operator
+but std::ostream is part of the standard library, we can't edit it to add this
+so it must be a friend function
+
+we can overload operator+(Cents, int), but not operator+(int, Cents)
+int isn't a class we can add members to
+
+we can't use a member overload if left operand is not a class (int) or a class we can't modify (std::ostream)
+
+in most cases language leaves it up to us to decide if we want to use normal/friend or member version
+but one is usually better than the other
+
+with binary operators that don't modify left operand, normal or friend function is preferred
+it works for all parameter types
+normal or friend function version has benefit of "symmetry"
+all operands are explicit parameters, rather than one being implicit *this
+
+with binary operators that do modify left operand, member version is preferred
+leftmost operand will almost always be a class and having object being modified become *this makes sense
+since rightmost operand is still explicit, no confusion over what's being modified and what's being evaluated
+
+unary operators are generally member functions as well
+member version has no parameters
+
+rules of thumb:
+	if you're overloading assignment, subscript, function call, or member selection, do so as a member function
+	if you're overloading a unary operator, do so as a member function
+	if you're overloading a binary operator that modifies its left operand, do so as a member function if you can
+	if you're overloading a binary operator that doesn't modify its left operand, do so as a normal function or a friend function

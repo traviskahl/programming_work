@@ -1,0 +1,217 @@
+1) What do the following programs print? This exercise is meant to be done by inspection, not by compiling the examples with your compiler.
+
+1a)
+class A
+{
+public:
+    virtual const char* getName() { return "A"; }
+};
+ 
+class B: public A
+{
+public:
+    virtual const char* getName() { return "B"; }
+};
+ 
+class C: public B
+{
+public:
+// Note: no getName() function here
+};
+ 
+class D: public C
+{
+public:
+    virtual const char* getName() { return "D"; }
+};
+ 
+int main()
+{
+    C c;
+    A &rBase = c;
+    std::cout << rBase.getName() << '\n';
+ 
+    return 0;
+}
+Answer: This should print "B". Since rBase is an A reference to a C object, it gets the most derived version of getName between A and C.
+This happens to be B::getName().
+
+1b)
+class A
+{
+public:
+    virtual const char* getName() { return "A"; }
+};
+ 
+class B: public A
+{
+public:
+    virtual const char* getName() { return "B"; }
+};
+ 
+class C: public B
+{
+public:
+    virtual const char* getName() { return "C"; }
+};
+ 
+class D: public C
+{
+public:
+    virtual const char* getName() { return "D"; }
+};
+ 
+int main()
+{
+    C c;
+    B &rBase = c; // note: rBase is a B this time
+    std::cout << rBase.getName() << '\n';
+ 
+    return 0;
+}
+Answer: This should print "C". Since rBase is a B reference to a C object, it gets the most derived version between B and C.
+This is C::getName().
+
+1c)
+class A
+{
+public:
+    const char* getName() { return "A"; } // note: not virtual
+};
+ 
+class B: public A
+{
+public:
+    virtual const char* getName() { return "B"; }
+};
+ 
+class C: public B
+{
+public:
+    virtual const char* getName() { return "C"; }
+};
+ 
+class D: public C
+{
+public:
+    virtual const char* getName() { return "D"; }
+};
+ 
+int main()
+{
+    C c;
+    A &rBase = c;
+    std::cout << rBase.getName() << '\n';
+ 
+    return 0;
+}
+Answer: This should print "A". A::getName() is not marked as virtual, it will not look for a more derived version.
+
+1d)
+class A
+{
+public:
+    virtual const char* getName() { return "A"; }
+};
+ 
+class B: public A
+{
+public:
+    const char* getName() { return "B"; }  // note: not virtual
+};
+ 
+class C: public B
+{
+public:
+    const char* getName() { return "C"; } // note: not virtual
+};
+ 
+class D: public C
+{
+public:
+    const char* getName() { return "D"; } // note: not virtual
+};
+ 
+int main()
+{
+    C c;
+    B &rBase = c; // note: rBase is a B this time
+    std::cout << rBase.getName() << '\n';
+ 
+    return 0;
+}
+Answer: This should print "C". Even though no function except A::getName() is marked as virtual, they are still virtual functions.
+C::getName() is the most derived version of the function, so that's what gets called.
+
+1e)
+class A
+{
+public:
+    virtual const char* getName() const { return "A"; } // note: function is const
+};
+ 
+class B: public A
+{
+public:
+    virtual const char* getName() { return "B"; }
+};
+ 
+class C: public B
+{
+public:
+    virtual const char* getName() { return "C"; }
+};
+ 
+class D: public C
+{
+public:
+    virtual const char* getName() { return "D"; }
+};
+ 
+int main()
+{
+    C c;
+    A &rBase = c;
+    std::cout << rBase.getName() << '\n';
+ 
+    return 0;
+}
+Answer: This should print "A". Since B::getName() and C::getName() are not const, then they aren't considered overrides to A::getName().
+
+1f)
+#include <iostream>
+class A
+{
+public:
+	A() { std::cout << getName(); } // note addition of constructor
+ 
+	virtual const char* getName() { return "A"; }
+};
+ 
+class B : public A
+{
+public:
+	virtual const char* getName() { return "B"; }
+};
+ 
+class C : public B
+{
+public:
+	virtual const char* getName() { return "C"; }
+};
+ 
+class D : public C
+{
+public:
+	virtual const char* getName() { return "D"; }
+};
+ 
+int main()
+{
+	C c;
+ 
+	return 0;
+}
+Answer: This should print "A". At the time our object c is constructed, the constructor for A is called first.
+It calls the most derived version of getName() it can find, but the B and C parts of the object haven't been
+created yet. Therefore A::getName() is the most derived version at the time of the function call.

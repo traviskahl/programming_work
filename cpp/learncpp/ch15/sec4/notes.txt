@@ -1,0 +1,25 @@
+sometimes you want to use move semantics, but your targets are l-vals not r-vals
+
+EX: copyswap.cpp
+
+this is inefficient
+we make 3 copies which isn't necessary
+we want to be able to use moves instead, but have no way of doing so
+except we do: std::move
+
+CPP11 introduces std::move
+this function converts the argument to an r-val
+here's same example with move semantics
+
+EX: moveswap.cpp
+
+same output, more efficiency
+
+we can use std::move to fill a vector
+
+EX: vectors.cpp
+
+first we push_back an l-val, so str is intact
+second se push_back an r-val, so str is stolen
+
+can also be useful when sorting

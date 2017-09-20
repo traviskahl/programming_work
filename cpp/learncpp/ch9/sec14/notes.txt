@@ -1,0 +1,54 @@
+the assignment operator (operator=) copies value from one object to another already existing object
+
+the purpose of operator= and copy constructor are almost the same, both copy one object into another
+but copy constructor initializes new objects
+operator= replaces contents of existing objects
+
+difference between the two causes confusion for new programmers but it's not extremely difficult
+	if a new object has to be created, copy constructor is used
+	if a new object doesn't need to be created, assignment operator is used
+
+there's one specific caveat, which we'll talk about
+assignment operator must be overloaded as a member function
+
+EX: simple.cpp
+
+it's pretty straight-forward, does what we'd expect
+overloaded operator= returns *this, so we can chain multiple assignments together
+
+here's the interesting part
+c++ allows self-assignment
+
+	Fraction f1(5, 3);
+	f1 = f1; // self assignment
+
+in this case all members are assigned to themselves
+here it's not a big deal since it only wastes time
+but with dynamic memory allocation it's a more dangerous possibility
+
+EX: danger.cpp
+
+we'll get garbage output or a crash
+what's going on?
+
+consider what happens when implicit object and passed parameter are the same
+m_data is the same as str.m_data
+first thing that happens is that functions checks to see if the implicit object already has a string
+if it does it deletes it so we don't get a memory leak
+in this case m_data is deleted, but str.m_data points to the same address
+so now str.m_data is a dangling pointer
+when we copy the data from str into the implicit object we try to access the dangling pointer
+so we copy garbage data or try to access memory the application doesn't own anymore
+
+we can do check to see if self-assignment occurred
+
+	if (this == &fraction)
+		return *this
+
+by checking if the implicit object is the same one as the passed parameter, we can just exit without doing anything
+
+unlike other operators the compiler will provide a default public assignment operator if we don't provide one
+does memberwise assignment
+
+we can prevent assignments from happening by making the assignment operator private
+or by using the delete keyword

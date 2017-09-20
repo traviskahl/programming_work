@@ -1,0 +1,91 @@
+when using polymorphism we often have a pointer to a base class
+but we want to access information that only exists in a derived class
+
+EX: contrived.cpp
+
+getObject() always returns a Base pointer
+but it could be pointing to either a Base or Derived object
+if it's pointing to a Derived object, how can we get its name?
+
+one way could be to add a virtual function to Base called getName()
+but what would it return if we call it on a Base object?
+there's no value that makes sense
+we'd also be cluttering our Base class with things that should be in our Derived class
+
+c++ lets us implicitly convert a Derived pointer to a Base pointer
+process is sometimes called upcasting
+what if there was a was to convert a Base pointer into a Derived pointer?
+if there was, we could call getName() without needing a virtual function
+
+c++ provides a casting operator called dynamic_cast
+the most common use is converting base-class pointers into derived-class pointers
+this is called downcasting
+using it works just like static_cast
+
+EX: dyncast.cpp
+
+this example works because b is actually pointing to a Derived object
+therefore converting to a Derived pointer will succeed
+but we assumed that b is pointing to a Derived object
+what if it wasn't?
+then the dynamic_cast will fail and the result will be a null pointer
+if we don't check for a null pointer result and try to dereference it, we'll get undefined behavior
+
+	Base* b = getObject(true);
+	Derived* d = dynamic_cast<Derived*>(b);
+
+	if (d) // make sure d is non-null
+		// code here
+
+	delete b;
+	return 0;
+
+Rule: always make sure your dynamic casts actually succeeded by checking for a null pointer result
+
+since dynamic_cast does consistency checking to make sure conversion can be made it takes a performance hit
+
+there's a few cases where downcasting with dynamic_cast won't work
+	with a virtual base class
+	with protected or private inheritance
+	for classes that don't declare or inherit virtual functions (and don't have a virtual table)
+
+downcasting can also be done with static_cast
+main difference is static_cast doesn't do runtime checking to make sure the operation makes sense
+makes it faster but more dangerous
+casting a Base* to a Derived* will "succeed" even if Base pointer isn't pointing to a Derived object
+gives us undefined behavior when dereferencing it
+
+if we're completely sure that casting will succeed, static_cast is acceptable
+one way to ensure this is by using a virtual function
+
+EX: statcast.cpp
+
+but if we go through implementing it and paying the cost of calling a virtual function and processing it
+	we might as well just use dynamic cast
+
+dynamic_cast is most often used with pointers
+but it also works with references
+works pretty much the same as with pointers
+
+	Derived apple(1, "Apple");
+	Base& b = apple;
+	Derived& d = dynamic_cast<Derived&>(b);
+
+since c++ doesn't have a "null reference" dynamic_cast can't return one upon failure
+instead it throws a std::bad_cast exception
+
+new programmers often get confused on whether to use static_ or dynamic_cast
+here's when:
+	just use static_cast
+	unless you're downcasting, then use dynamic_cast
+	but even then consider using virtual functions to avoid casting altogether
+
+some developers think dynamic_cast is the spawn of satan and indicates bad design
+they say you should use virtual functions
+in general they're right: try to use virtual functions whenever possible
+
+but there are times when downcasting is the better choice:
+	when we can't modify the base class to add a virtual function (e.g. the base class is part of the standard library)
+	when we need to access something that's derived-class specific (e.g. an access function that's only in the derived class)
+	when adding a virtual function to the base class doesn't make sense (e.g. there's no appropriate value for the base class to return)
+		using a pure virtual function here might be an option if we don't need to instantiate it

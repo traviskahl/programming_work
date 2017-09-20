@@ -1,0 +1,8 @@
+2) Explain how r-values references enable move semantics.
+
+R-values enable move semantics by letting us overload functions for either r-values or l-values. By passing either an l-value or an r-value
+to a function, we can decide to either copy the value or move it instead.
+
+answer from website:
+Because r-values are temporary, we know they are going to get destroyed after they are used. When passing or return an r-value by value, it’s wasteful to make a copy and
+then destroy the original. Instead, we can simply move (steal) the r-value’s resources, which is generally more efficient. 

@@ -1,0 +1,1 @@
+1) For the Cents example above, rewrite operators < and <= in terms of other overloaded operators.

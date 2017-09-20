@@ -1,0 +1,69 @@
+input and output isn't part of c++ but is part of standard library
+is in std namespace
+
+when we include iostream header we get many classes that have io functionality
+uses this hierarchy
+
+				ios_base
+				    ^
+				   ios
+			       ^ ^
+		istream 				ostream
+		(input) 				(output)
+          ^     ^                ^    ^
+istream_withassign   iostream		ostream_withassign
+		(cin)                        (cout, cerr, clog)
+                        ^
+					iostream_withassign
+
+
+this hierarchy uses multiple inheritance, even though it's usually avoided
+iostream library has been extensively tested to avoid typical problems
+
+io in c++ is implemented with streams
+stream: a sequence of characters that can be accessed sequentially
+can produce or consume an infinite amount of data
+
+input streams are used to hold input from a data producer
+can be keyboard, file, network, etc
+user might press key while program isn't expecting any input
+instead of ignoring it, data is put in input stream until it can be used
+
+output streams are used to hold output for a data consumer
+monitor, file, printer, etc.
+device might not be ready to accept the data yet
+printer might be warming up when program writes data to output stream
+data sits in output stream until printer begins consuming it
+
+some devices like files and networks are capable of being both input and output sources
+
+we only need to learn how to interact with streams in order to read them
+how they actually work doesn't really matter to us
+
+ios is the most base class we'll work with
+ios class defines things that are common to both input and output streams
+
+istream class is primary class used for input 
+extraction operator >> is used to remove values
+when user presses key, key code is placed in an input stream
+program then extracts it to use it
+
+ostream is primary class used for output streams
+insertion operator << is used to put values in the stream
+you insert values to the stream, consumer uses them
+
+iostream can handle both input and output
+bidirectional io
+
+some classes that end with _withassign
+derived from istream, ostream, and iostream
+allow you to assign one stream to another using assignment operator
+
+standard streams are preconnected streams provided by a program to the environment
+c++ comes with four predefined streams that we can use
+	cin: istream_withassign tied to standard input
+	cout: ostream_withassign tied to the standard output
+	cerr: ostream_withassign tied to standard error with unbuffered output
+	clog: ostream_withassign tied to standard error with buffered output
+
+example: basic.cpp

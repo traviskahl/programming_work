@@ -1,0 +1,42 @@
+std::unique_ptr is designed to handle one resource by itself
+by contrast std::shared_ptr is designed to have multiple smart pointers owning a single resource
+it keeps track of how many std::shared_ptr are sharing the resource
+if there's at least one, it won't be deallocated even if individual std::shared_ptr are destroyed
+also lives in the <memory> header
+
+EX: simple.cpp
+
+we create a dynamic Resource object and set a std::shared_ptr to manage it
+in the block we use copy initialization to set another std::shared_ptr that points to the same resource
+we have to use copy initialization for this reason:
+
+EX: separate.cpp
+
+this crashes on some machines
+we created two std::shared_ptr that pointed to the same resource but were independent
+it's then deallocated twice
+we can avoid this by using copy initialization or copy assignment
+
+std::make_shared() also exists similar to std::make_unique
+here's the same example using std::make_shared()
+
+EX: make_shared.cpp
+
+it's simpler and safer
+can't make two independent std::shared_ptr pointing at the same resource
+also performs more quickly
+
+it actually uses two pointers internally
+one points at the resource being managed
+the other points at a control block which keeps track of how many std::shared_ptr point to the resource
+with std::make_shared, this is done in one allocation
+when creating two independent that point to the same resource, they both create their own control block
+so they don't know there's another one
+but using copy assignment or initialization uses the same control block
+
+std::unique_ptr can be converted into std::shared_ptr
+but it isn't completely safe
+so if you're returning a smart pointer, just use a std::unique_ptr
+
+if the std::shared_ptr isn't disposed of, the resource won't be either
+if any std::shared_ptr is left over, then the resource will never be deallocated

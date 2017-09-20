@@ -1,0 +1,3 @@
+2) Extra credit #1: The GradeMap class and sample program we wrote is inefficient for many reasons. Describe one way that the GradeMap class could be improved. 
+The GradeMap class could be improved by sorting the vector. This would let us only search a portion of the vector to find a given value
+and determine if it exists.

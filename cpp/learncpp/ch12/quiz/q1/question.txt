@@ -1,0 +1,231 @@
+1) Each of the following programs has some kind of defect. Inspect each program (visually, not by compiling) and determine what is wrong with the program. The output of each program is supposed to be “Derived”.
+
+1a)
+#include <iostream>
+ 
+class Base
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	const char* getName() const { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	const char* getName() const { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived d(5);
+	Base &b = d;
+	std::cout << b.getName();
+ 
+	return 0;
+}
+Answer: b.getName() will call Base::getName() because it can only see the Base portion of the object.
+
+1b)
+#include <iostream>
+ 
+class Base
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	virtual const char* getName() const { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived d(5);
+	Base &b = d;
+	std::cout << b.getName();
+ 
+	return 0;
+}
+Answer: Derived::getName() isn't considered an override of Base::getName() because it is const.
+		So Base::getName() will be called instead.
+
+1c)
+#include <iostream>
+ 
+class Base
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	virtual const char* getName() override { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived d(5);
+	Base b = d;
+	std::cout << b.getName();
+ 
+	return 0;
+}
+Answer: Since the Base object was initialized by copy, the Derived object was sliced. So it doesn't even have a Derived portion.
+
+1d)
+#include <iostream>
+ 
+class Base final
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	virtual const char* getName() override { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived d(5);
+	Base &b = d;
+	std::cout << b.getName();
+ 
+	return 0;
+}
+Answer: The Base class is defined as final, meaning it can't have any derived classes.
+
+1e)
+#include <iostream>
+ 
+class Base
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	virtual const char* getName() = 0 { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived d(5);
+	Base &b = d;
+	std::cout << b.getName();
+ 
+	return 0;
+}
+Answer: Derived::getName() is a pure virtual function, meaning it can't be called.
+
+1f)
+#include <iostream>
+ 
+class Base
+{
+protected:
+	int m_value;
+ 
+public:
+	Base(int value)
+		: m_value(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Base"; }
+};
+ 
+class Derived : public Base
+{
+public:
+	Derived(int value)
+		: Base(value)
+	{
+	}
+ 
+	virtual const char* getName() { return "Derived"; }
+};
+ 
+int main()
+{
+	Derived *d = new Derived(5);
+	Base *b = d;
+	std::cout << b->getName();
+	delete b;
+ 
+	return 0;
+}
+Answer: The Derived portion of the object will never be deleted because we don't have a virtual destructor.

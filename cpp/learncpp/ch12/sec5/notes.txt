@@ -1,0 +1,92 @@
+to implement virtual functions c++ uses a form of late binding
+this is known as the virtual table
+virtual table is a lookup table of functions used to resolve function calls in a late binding manner
+sometimes known as vtable, virtual function table, virtual method table, or dispatch table
+
+simple, but hard to put in words
+every class that uses virtual functions has its own virtual table
+it's just a static array the compiler sets up at compile time
+contains one entry for every virtual function that can be called by objects of the class
+each entry is a function pointer that points to the most-derived function accessible
+
+compiler also adds a hidden pointer to the base class
+we'll call it *__vptr
+set automatically when instance is created so it points to the virtual table for the class
+*this is a function parameter used by the compiler to resolve self-references
+but *__vptr is a real pointer
+it makes each class object allocated bigger by the size of one pointer
+*__vptr is inherited by derived classes
+
+simple example:
+
+	class Base {
+	public:
+		virtual void function1() {}
+		virtual void function2() {}
+	};
+
+	class D1 : public Base {
+	public:
+		virtual void function1() {}
+	};
+
+	class D2 : public Base {
+	public:
+		virtual void function2() {}
+	};
+
+3 classes, so compiler creates 3 virtual tables
+one for Base, one for D1, and one for D2
+also adds hidden pointer to most base class that uses virtual functions
+
+when object is created *__vptr is set to point to virtual table for that class
+when a Base is created *__vptr points to virtual table for Base
+same for D1 and D2: set to virtual table for D1 and D2
+
+since there are two functions, each virtual table has two entries
+each entry is the most-derived version for that class
+
+vtable for Base is simple
+no access to D1 or D2 functions
+
+vtable for D1 is more complex
+can access members of both D1 and Base
+however it's overridden function1() so D1::function1() is more derived than Base::function1()
+entry for function1() points to D1::function1()
+entry for function2() points to Base::function2() since it isn't overridden
+
+same but inverted for D2
+
+so when we create an object of type D1
+
+	D1 d1;
+
+d1 has its *__vptr set to the D1 virtual table
+if we set a Base pointer to d1
+
+	Base *dPtr = &d1;
+
+dPtr is a Base pointer so it only points to the Base portion of d1
+*__vptr is also in the Base portion of the class so dPtr has access to this pointer
+but dPtr->__vptr points to the D1 virtual table
+even though dPtr is a Base pointer it has access to D1 virtual table
+
+so if we call dPtr->function1()
+it calls D1::function1()
+
+first it recognizes that function1() is a virtual function
+it uses dPtr->__vptr to get to D1's virtual table
+it looks up which version of function1() to use, which is D1
+so it calls D1::function1()
+
+by using these tables the compiler and program ensure function calls resolve to the right function
+even if we're only using a reference of pointer to a base class
+
+calling a virtual function is slower for a few reasons
+we have to use *__vptr to get the right vtable
+we have to index the vtable to get the right function
+then we call the function
+but with modern computers that extra time is fairly insignificant
+
+any class with virtual functions has a *__vptr
+so it's bigger by the size of one pointer

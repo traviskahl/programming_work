@@ -1,0 +1,41 @@
+thanks to std::shared_ptr we can have multiple smart pointers managing the same resource
+but in certain cases this can be a problem
+example where pointers in separate objects point at the other object
+
+EX: person.cpp
+
+we allocate two Persons and partner them up
+this sets the std::shared_ptr in Lucy to Ricky and vice-versa
+but no deallocations happen
+
+after partnerUp(), ricky goes out of scope
+ricky checks to see if any other pointers co-own "Ricky"
+"Lucy" does, so it isn't deallocated
+the same happens for lucy
+this happens when circular references are formed
+
+Circular reference (cyclical reference or cycle also) is when a series of references where each object references the next, and the last object
+references the first, causing a referential loop.
+they can be references, pointers, unique IDs, or some other way of identifying specific objects
+no object can be deallocated, because they all think something else needs it
+
+this can happen even with one std::shared_ptr
+it can reference the object that contains it
+called a reductive cycle
+
+EX: reductive.cpp
+
+std::weak_ptr solves the cyclical ownership problem
+it's an observer: observes and accesses the same object as a std::shared_ptr or std::weak_ptr but isn't an owner
+std::shared_ptr only counts the owners so std::weak_ptr doesn't count
+
+EX: weak_person.cpp
+
+works mostly the same as before
+but now it properly deallocates
+
+however std::weak_ptr don't have operator-> and aren't directly usable
+must convert to std::shared_ptr
+use the lock() member function
+
+no need to worry about circular dependencies with variable partner because it's local

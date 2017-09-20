@@ -1,0 +1,161 @@
+opengl expects vertices we want to use to be between -1.0 and 1.0
+coords outside this range won't be visible
+we usually specify coords in a range we specify ourselves
+then translate them in the vertex shader to NDC (normalized device coords, in range of |1.0|)
+then given to rasterizer and drawn on screen
+
+usually done by going step by step
+transform object's vertices to several coord systems
+some calculations are done more easily in one than another
+five systems are useful to us:
+	local space (object space)
+	world space
+	view space (eye space)
+	clip space
+	screen space
+
+to transform coords we use several matrices
+most important are model, view, and projection matrices
+vertex coords start in local space, then made into world coords, view coords, clip coords, then screen coords
+when modifying object, makes sense to do in local space
+when changing it with respect to other objects, do it in world space
+and so on, use different systems for different tasks
+
+local space is local to our object, where it begins
+if we have a cube in Blender, origin is probably at (0, 0, 0)
+vertices of containers we used so far have coords between -0.5 and 0.5 with 0.0 as origin
+those are in local space
+
+if we imported those objects together they'd be layered on top of each other
+we don't want that, we want a different position in a larger world
+world coords are exactly that
+transformation from local to world space is done with the model matrix
+it's a matrix that scales, translates, and/or rotates objects to place it in the world
+
+view space is often called the camera of opengl
+sometimes called camera space or eye space
+results from transforming world into something more viewable
+done by translating and rotating the scene so some items are transformed to the front of the camera
+stored inside a view matrix that turns world coords into view coords
+
+after a vertex shader is run opengl wants coords to be in a specific range
+if there's something outside the range, it's discarded (clipped)
+since specifying visible coords to be between -1.0 and 1.0 doesn't make sense we specify our own coords
+to transform vertex coords to clip space we define a projection matrix
+specify a range of coords (like -1000 to 1000) and it transforms coords in the range to NDC
+everything outside is clipped
+a vertex at (1250, 760, 300) would get clipped
+
+the "viewing box" a projection matrix uses is called a frustrum
+everything inside is mapped, outside is clipped
+the process to do all this is called projection
+
+once everything is transformed then perspective division is done
+divide x, y, and z by w to transform 4d clip space into 3d NDC
+automatically done at the end of vertex shaders
+then coords are mapped using the settings of glViewport() and turned to fragments
+
+we can use two different projection matrices
+this changes the frustrum and makes the same picture look different
+orthographic and perspective
+
+orthographic projection has a cube-like frustrum
+when creating one we specify the height, width, and length of the frustrum
+everything outside is clipped
+frustrum is defined by a width, height, and near and far planes
+any coord in front of near plane or behind far plane is clipped
+to create an orthographic view we can use glm::ortho()
+
+	glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+
+first two params define left and right coords of frustrum
+next two define top and bottom of frustrum
+5th and 6th define space between near and far planes
+this transforms all coords between these values into NDC
+
+ortho projection maps directly to the 2d plane
+but a direct projection causes unrealistic results since it doesn't take into account perspective
+that's what the perspective projection matrix is for
+crazy huh, perspective projection matrix handles perspective
+
+objects that are far away appear smaller
+that's what perspective is
+perspective projection matrix maps a frustrum to clip space but also manipulates w of each coord
+so that the farther the coord is from the viewer, the higher w becomes
+once coords are transformed to clip space everything with a w out of the range is clipped
+then perspective division is applied to clip space coordinates
+everything is divided by w so it has smaller coords if it's farther away
+perspective projection matrix is created with glm like this:
+
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 800.0f);
+
+glm::perspective creates a large frustrum that isn't shaped uniformly
+it's not a cube, a bit closer to a cone
+first parameter defines the field of view, the size of viewspace
+usually kept at 45 degrees for realism but for (((Q U A K E P R O))) can set it higher
+second parameter sets aspect ratio, divide viewport's width by height
+third and fourth params set the near and far planes
+usually we set near to 0.1f and far to 100.0f
+
+with ortho projection perspective division is still done
+but w is never modified, just stays at 1
+ortho makes things farther away look the same size which is goofy
+it's used mostly for 2d rendering and some architectural and engineering programs
+those things don't want vertices to be distorted by perspective
+3d modeling programs sometimes use ortho because it gives a better sense of dimensions
+
+to get our clip space we multiply all of these together
+remember that the order of matrix multiplication is reversed
+then should be assigned to gl_Position in vertex shader and opengl will perform perspective division and clipping
+
+now we can show objects as real 3d objects instead of objects in a plane
+to draw objects in 3d we need a model matrix
+consists of transformations we want to apply to transform all vertices into world coords
+by multiplying vertex coords with the model matrix we transform the object into the world
+
+then we create a view matrix
+we want to move slightly back so that the object is actually visible
+in world space we're at (0, 0, 0) by default
+to move a camera back, we could also move the whole scene forward
+like a mountain from the first tutorial
+move this mountain by translating the scene along the negative z-axis
+
+opengl is called a right-handed system
+positive x-axis is to our right
+positive y-axis is up
+positive z-axis is towards us
+think of it this way:
+	stretch right arm along positive y-axis, hand on top
+	let thumb point to the right
+	let index finger point up
+	bend middle finger down 90 degrees
+now our fingers point along the positive axes
+if we used our left hand, z-axis would be reversed
+called a left-handed system, USED BY DIRECTX
+in NDC opengl actually uses a left-handed system, that's not confusing
+
+create model matrix using glm::rotate
+	
+	glm::mat4 model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+can create a view matrix using glm::transform()
+
+	glm::mat4 view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
+
+and finally a projection matrix with glm::perspective
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+
+now we can get a 3 dimensional object
+
+let's work more in 3d
+rotating over time and using a larger vertices array and drawArrays() seems like a good idea
+but some faces are drawn over others in a trippy way
+we can fix this with a z-buffer
+
+a z-buffer is also known as a depth buffer
+depth is stored in each fragment and when it wants to output its color opengl compares that with what's in the z-buffer
+if current fragment is behind the other fragment it's discarded
+to enable this we should call glEnable(GL_DEPTH_TEST)
+we also want to clear it before each render, use glClear(GL_DEPTH_BUFFER_BIT)
+can use multiple options in glClear() using bitwise or ( | )

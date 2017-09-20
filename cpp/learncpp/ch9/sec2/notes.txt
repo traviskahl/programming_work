@@ -1,0 +1,55 @@
+some of the most common operators are arithmetic operators
+operator+, operator-, operator*, and operator/
+they're all binary: take two operands, one on each side of the operator
+they're all overloaded the same way as well
+
+there are three ways to overload operators:
+	member function
+	friend function
+	normal function
+
+here we'll cover the friend function method since it makes sense for binary operators
+
+EX: cPlus.cpp
+
+overloading operator+ is just writing a function
+it should have the type of operands we want to add and appropriate return type
+then we just write a function
+
+in this case it's very simple
+we want to add two Cents objects, so those are our operands
+the function should return an object of the same type as well
+
+to add two Cents objects, we should add their m_cents members
+since operator+ is a friend function, it can access that member
+c++ knows how to add integers so we just use that
+
+overloading operator- would be the same thing, just operators switched
+
+even though friend functions aren't members of the class they can still be defined inside one
+generally not recommended since non-trivial member function definitions should be outside the class definition
+but here it's used just to keep examples simple
+
+we often want overloaded operators to work with operands of different types
+if we have Cents(6) we might want to add 4 to get a Cents(10)
+when c++ evaluates "x + y", x becomes the first parameter and y becomes the second parameter
+when you're adding two operands of the same type the order doesn't matter
+either way the same version gets called
+but when the types are different, "x + y" isn't the same as "y + x"
+
+calling Cents(4) + 6 calls operator+(Cents, int)
+calling 6 + Cents(4) calls operator+(int, Cents)
+when we overload binary operators for operands of different types we need to write two functions
+one for each case
+
+EX: twoOverload.cpp
+
+EX: minmax.cpp
+
+MinMax keeps track of minimum and maximum values it's seen so far
+we overloaded operator+ three times to add two MinMax objects or add integers
+
+we defined operator+(int, MinMax) by just calling the other version
+might be slightly less efficient because of an extra function call
+but it makes the code shorter and easier to maintain
+do similar things when possible

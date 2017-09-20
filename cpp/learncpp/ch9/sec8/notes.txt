@@ -1,0 +1,77 @@
+when working with arrays we usually use subscript operator[] to get specific elements
+but what if we have a container class that has a private array member variable
+we can't access it directly, so we can't get or set values in it
+without operator overloading we could just use access functions
+it works but it's not particularly user friendly
+
+	list.setItem(2, 3);
+
+are we setting element 2 to the value 3 or element 3 to value 2?
+without knowing how it's implemented, it's not clear
+
+we could return entire list and use operator[] to access elements
+it also works but the syntax is strange
+
+	list.getList()[2] = 3;
+
+a better solution is to overload operator[]
+subscript operator must be overloaded as a member function
+always takes one parameter: subscript that user places between square brackets
+if we have an IntList, we expect user to pass in an integer index
+and we return an int value as a result
+
+	int& IntList::operator[](const int index) { return m_list[index]; }
+
+so if we use subscript operator on an object of type IntList, it returns the corresponding element
+lets us set or get elements of the array directly
+
+it's easy from a syntax and comprehension point of view
+when // list[2] // evaluates compiler checks if there's an overloaded operator[]
+if there is, it passes the value in the square brackets as an argument
+
+we can provide a default value for the parameter
+but calling operator[] with no subscript value isn't valid syntax
+so it's pretty useless
+
+why does it return a reference?
+so that it returns the actual element, not just a copy
+if it returned a value, we might end up with something that evaluates to 6 = 3;
+and that's not okay
+
+in our example operator[] is a non-const function
+but what if we have a const object?
+we couldn't call it since we might change the state of a const object
+we can define a const and non-const version separately
+
+EX: const.cpp
+
+another benefit of overloading operator[] is that we can do error checking
+normally the subscript operator doesn't check if index is valid
+but if we know the size of our array we can make overloaded operator[] check if index is in proper bounds
+
+if we try to call operator[] on a pointer to an object c++ assumes we're trying to index an array of objects of that type
+
+	IntList* list = new IntList;
+	list[2] = 3; // this assumes we're trying to access index 2 of an array of IntLists
+	delete list;
+
+we can't assign an integer to an IntList so this doesn't compile
+Rule: make sure you're not trying to call an overloaded operator[] on a pointer to an object
+we should dereference the pointer first, then call operator[]
+
+	(*list)[2] = 3;
+
+it's ugly and error prone
+just don't set pointers to objects unless you need to
+
+function parameter doesn't even need to be an integer
+c++ passes what the user types between braces as an argument to overloaded function
+in most cases it's an int value
+but it's not required and we can define that operator[] takes any value we want
+it could take a double, a std::string, whatever we want, go wild
+
+EX: stupid.cpp
+
+overloading operator[] to take strings is useful when writing some classes
+such as those that use words as indices
+

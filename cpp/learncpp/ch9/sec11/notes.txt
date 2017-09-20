@@ -1,0 +1,69 @@
+c++ supports 3 kinds of initialization
+	direct
+	uniform
+	copy
+
+direct initialization:
+	int x(5);
+	Fraction fiveThirds(5, 3);
+
+uniform initialization:
+	int x { 5 };
+	Fraction fiveThirds {5, 3};
+
+copy initialization:
+	int x = 6;
+	Fraction six = Fraction(6);
+	Fraction seven = 7;
+
+with direct and uniform initialization, the object being created is directly initialized
+but copy is more complex, let's focus on that
+
+EX: detour.cpp
+
+how does this work?
+
+init of fiveThirds is a direct init that calls Fraction(int, int)
+init of fCopy is also a direct init, but what constructor does it call?
+calls Fraction's copy constructor
+
+copy constructor: a special type of constructor used to create a new object as a copy of another object
+like a default constructor, if we don't provide one c++ gives us one
+since compiler doesn't know much about our class default copy constructor uses memberwise initialization
+this means that each member of the copy is initialized directly from the member of the class being copied
+
+we can explicitly define a copy constructor
+
+EX: copy.cpp
+
+copy constructor we defined uses memberwise initialization
+it's pretty much the same as what we'd get by default, except we added an output statement
+unlike with default constructors where we should always make our own, it's ok to use default copy constructor if we need
+
+we can prevent copies of our classes from being made by making the copy constructor private
+or sometimes it'll be elided
+
+EX: elide.cpp
+
+first we direct initialize an anonymous Fraction object using Fraction(int, int)
+then we use that anonymous Fraction as an initializer for Fraction fiveThirds
+it should call the copy constructor, but it might not
+
+initializing the anonymous object then copy initializing another object takes two steps
+but the end result is the same as just direct initializing the object, which takes one step
+in these cases the compiler can opt out of calling the copy constructor
+and it'll just do a direct initialization
+this is called elision
+
+we wrote
+	
+	Fraction fiveThirds(Fraction(5, 3));
+
+but the compiler might change it to
+	
+	Fraction fiveThirds(5, 3);
+
+which only requires one constructor call
+if elision is used, anything in the body of the copy constructor isn't executed
+if we make the copy constructor private, ANYTHING that would use it gives us a compiler error
+even if the copy constructor is elided

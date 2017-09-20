@@ -1,0 +1,6 @@
+1. int sumTo(int value);
+2. void printEmployeeName(const Employee &employee);
+3. void minMax(int num1, int num2, int &larger, int &smaller); // don't forget to have out suffix, try &minOut and &maxOut
+4. int getIndexOfLargestValue(const int *array, int length);
+5. &int getElement(const int *array, int index); // return should be const, try const int& getElement
+

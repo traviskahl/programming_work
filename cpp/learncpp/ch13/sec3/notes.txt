@@ -1,0 +1,70 @@
+function templates allow us to generalize functions to work with different data types
+it's great but doesn't solve all our problems
+in the past we used composition to implement classes that contain multiple instances of other classes
+one example was our IntArray
+
+EX: IntArray.h
+
+works great - for ints
+what if we want to hold doubles?
+we'd need to make a whole new class
+it'd be mostly identical, the only difference being the held data type
+this is another instance where templates are a great help
+
+creating template classes is mostly identical to creating template functions
+
+EX: Array.h
+
+it's almost identical to IntArray but uses templates
+we also defined getLength outside of class declaration
+it's not necessary but new programmers might not understand without the example
+each templated member function outside the class declaration needs its own template declaration
+also the name is Array<T> not Array
+Array refers to some non-templated class named Array
+
+EX: ArrayEX.cpp
+
+template classes are instanced the same way template functions are
+compiler stencils out a copy on demand with template parameter replaced by data type
+then compiles the copy
+if we don't use it, it won't get compiled
+
+template classes are good for implementing container classes
+they can work with many data types without duplicating code
+syntax is ugly and error messages are cryptic, but they're one of C++'s most useful features
+
+templates aren't classes or functions: they're outlines of those
+so they don't work in exactly the same way as normal functions or classes
+normally it isn't an issue but there's one issue that commonly causes problems
+with non-template classes the common procedure is to put the class definition in a header file
+and member functions in a similarly named code file
+this way source for class is compiled as a separate project file
+but it doesn't work this way for functions
+
+EX: main.cpp, Array.h, Array.cpp
+
+for a compiler to use a template it needs the definition and template type used to instantiate it
+c++ compiles files individually
+when Array.h is #included in main template class definition is copied into main.cpp
+when compiler sees we need two different types it instantiates them and compiles them as part of main.cpp
+but when it compiles Array.cpp separately it forgets that we need the different types
+so template function is never instantiated
+we get a linker error because compiler can't find defintions for getLength()
+
+there are some ways to work around this
+
+one way is to put all code in header file
+then when it's #included, all template code is in one place
+it's simple
+but if it's used in many places we get many local copies of the template class
+this increases compile and link times but doesn't bloat executable
+preferred solution unless compile and link times are a problem
+
+other solution could be #including .cpp files, but it's not recommended
+there's non-standard usage of #include
+
+or we could use a three-file approach
+template class definition goes in header
+template class member functions go in code file
+then a third file contains all instantiated classes we need
+it's more efficient, but requires maintenence

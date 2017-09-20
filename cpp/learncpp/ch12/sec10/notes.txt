@@ -1,0 +1,44 @@
+oftentimes for doing output we need to overload the insertion operator
+there are some things to think about when dealing with this and virtual functions
+
+EX: typical.cpp
+
+printing a reference to a Derived object doesn't work like we want
+it's because our operator<< isn't virtual so std::cout << bref calls the Base version instead
+
+but if operator<< isn't virtual, can't we just make it virtual?
+nope.
+
+only member functions can be virtualized
+operator<< is usually a friend function
+
+even if we could virtualize it, the parameters are different
+the Derived version wouldn't be considered an override so virtual function resolution wouldn't work
+
+the answer to our problem is fairly simple
+operator<< is still a friend function as usual
+but instead of it doing the printing itself it delegates that duty to another function
+one that can be virtualized
+
+EX: solution.cpp
+
+how does this work?
+
+in Base case, we call operator<<
+operator<< calls virtual function print()
+since Base reference parameter points to a Base, b.print() becomes Base::print()
+
+in Derived case compiler looks to see if there's an operator<< that takes a Derived object
+there's not, so it goes up the tree
+compiler does an implicit upcast and calls Base::operator<<
+then calls virtual print(), which is Derived::print()
+
+we don't need an operator<< for each derived class
+version that handles Base objects works for Base and all derived classes
+
+third case is a mix of the two
+first compiler matches variable bref with operator<< that takes a Base
+then calls virtual print() 
+since bref is actually referencing a Derived, it calls Derived::print()
+
+no problemo.

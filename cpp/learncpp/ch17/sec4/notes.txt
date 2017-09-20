@@ -1,0 +1,21 @@
+STL also gives us some generic algorithms to work with container classes
+lets us search, sort, insert, reorder, remove, copy, etc.
+implemented as global functions using iterators
+only need to implemented once, usually works for all containers with iterators, even custom ones
+however it might not work with some containers, give us infinite loops, or perform poorly
+use them by including algorithm header
+
+min_element() and max_element() find the greatest and least values in a container
+
+EX: minmax.cpp
+
+this example uses find() to find a value then uses list::insert() to add a new value at that point
+
+EX: find.cpp
+
+we can sort a vector and reverse it
+
+EX: sort.cpp
+
+sort() doesn't work on list container classes
+they have their own function which is actually more efficient

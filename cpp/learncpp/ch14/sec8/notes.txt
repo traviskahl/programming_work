@@ -1,0 +1,48 @@
+exceptions are great but they have some potential downsides
+new programmers might have a problem with cleaning up resources after an exception
+
+	try {
+		openFile(filename);
+		writeFile(filename, data);
+		closeFile(filename);
+	}
+	catch (FileException &exception) {
+		std::cerr << "failed to write to file: " << exception.what() << std::endl;
+	}
+
+if writeFile() fails, the file is never closed
+solved by adding a closeFile() to beginning of catch block
+
+also a problem when dealing with dynamically allocated memory
+
+	try {
+		Person *john = new Person("John", 18, PERSON_MALE);
+		processPerson(john);
+		delete john;
+	}
+	catch (PersonException &exception) {
+		std::cerr << "Failed to process person: " << exception.what() << '\n';
+	}
+
+if processPerson() throws an exception then john is never deleted
+memory leak follows
+as is, we can't delete john inside catch because it's declared in a different block
+we can declare john outside of try block so it doesn't go out of scope at end of try block
+another solution is to use a smart pointer like std::unique_ptr
+
+exceptions should never be thrown inside destructors
+problems occur when exception is thrown from destructor during stack unwinding
+compiler doesn't know whether to continue unwinding or handle the exception
+program will just be terminated immediately
+
+exceptions come with small performance price
+increase size of executable and might cause it to run slower
+main performace hit is when exception is actually thrown
+stack must be unwound and appropriate exception handler found
+this is fairly expensive
+exception handling is best saved for exceptional cases and catastrophic errors
+routine error checking is best left to other means
+
+some modern arches support zero-cost exceptions
+they have no runtime cost in non-error cases (which we care about most)
+but there's a larger penalty when exceptions are thrown

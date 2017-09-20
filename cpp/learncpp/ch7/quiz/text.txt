@@ -1,0 +1,4 @@
+1.
+    a. double max(double x, double y);
+    b. void swap(int &x, int &y);
+    c. int& getLargestElement(const int *array, int length); // array can't be const, would be a violation

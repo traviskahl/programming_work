@@ -1,0 +1,22 @@
+in the past we overloaded operator+ as a friend function
+it's convenient because we get direct access to internal members of the classes we're operating on
+but if we don't need that access we can write overloaded operators as normal functions
+our Cents class has an access function to get the data member we need
+so our overloaded operator+ can be written as a non-friend
+
+EX: normal.cpp
+
+normal and friend functions function almost identically, just with different access levels
+the one difference is that friend function inside class is also a prototype
+with normal function we need to have our own function prototype
+
+EX: cents.h
+	cents.cpp
+	main.cpp
+
+in general normal functions should be preferred over friend functions
+as long as you can do so with the existing functions
+don't add additional access functions to overload an operator as a normal as opposed to a friend
+
+Rule: prefer overloading operators as normal functions instead of friends if it's possible to
+	do so without adding additional functions.

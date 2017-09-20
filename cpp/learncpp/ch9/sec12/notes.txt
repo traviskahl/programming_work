@@ -1,0 +1,41 @@
+with this line of code:
+
+	int x = 5;
+
+x is copy initialized to set it to 5
+classes are more complicated since they use constructors
+
+EX: fraction.cpp
+
+this example produces the expected output
+it's evauated the same as
+
+	Fraction six(Fraction(6));
+
+this potentially makes more calls than is really necessary and could be elided
+but elision isn't guaranteed so it's better to avoid copy initialization for classes
+use direct or uniform initialization instead
+Rule: avoid using copy initialization, and use uniform initialization instead
+
+there's a few other places where copy initialization should be used
+but two examples are worth mentioning
+
+when we pass or return a class by value copy initialization is used
+
+EX: pass.cpp
+
+from the output statements we know that the copy constructor was called twice
+a class was passed by value once and called by value once
+in these cases the constructor can't be elided
+but in other cases the compiler might choose to
+
+	class Something {};
+	Something foo() {
+		Something s;
+		return s;
+	}
+	int main() {
+		Something s = foo();
+	}
+
+here the compiler will elide the copy constructor, even though variable s is returned by value

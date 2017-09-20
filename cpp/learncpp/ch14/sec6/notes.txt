@@ -1,0 +1,132 @@
+we might have a case where we want to catch an exception but not fully handle it where we caught it
+common when we want to log an error but pass issue to caller to handle
+
+when the function can use a return code it's simple
+	
+	Database* createDatabase(std::string filename) {
+		try {
+			Database *d = new Database(filename);
+			d.open(); // assume this throws an int exception on failure
+			return d;
+		}
+		catch (int exception) {
+			// Database creation failed
+			// Write an error to some global logfile
+			g_log.logError("Creation of database failed");
+		}
+
+		return nullptr;
+	}
+
+if something goes wrong the exception handler logs an error and reasonably returns nullptr
+consider this function:
+
+	int getValueFromDatabase(Database *d, std::string table, std::string key) {
+		assert(d);
+
+		try {
+			return d->getIntValue(table, key); // throws int exception on failure
+		}
+		catch (int exception) {
+			// Write an error to some global logfile
+			g_log.logError("doSomethingImportant failed");
+
+			// However, we haven't actually handled this error
+			// So what do we do here?
+		}
+	}
+
+if it succeeds, it returns an int value - any of which could be valid
+what if something goes wrong?
+getIntValue() throws int exception, which we catch and log
+how do we tell caller that something went wrong?
+there isn't a good return code to use since any int value could be valid
+
+throwing a new exception
+
+	int getValueFromDatabase(Database *d, std::string table, std::string key) {
+		assert(d);
+
+		try {
+			return d->getIntValue(table, key); // throws int exception on failure
+		}
+		catch (int exception) {
+			// Write an error to some global logfile
+			g_log.logError("doSomethingImportant failed");
+
+			throw 'q'; // throw char exception 'q' up the stack to be handled by caller of getIntValueFromDatabase()
+		}
+	}
+
+program catches the int exception from getIntValue(), logs error, and throws a new exception
+it seems odd to throw from catch block, but it's allowed
+only exceptions in a try block can be caught
+this one is therefore delegated up the stack
+can be any type, not just the type that was caught
+
+could rethrow same exception
+
+	int getValueFromDatabase(Database *d, std::string table, std::string key) {
+		assert(d);
+
+		try {
+			return d->getIntValue(table, key); // throws int exception on failure
+		}
+		catch (int exception) {
+			// Write an error to some global logfile
+			g_log.logError("doSomethingImportant failed");
+
+			throw exception;
+		}
+	}
+
+works, but has some downsides
+doesn't throw exact same exception as the one that was caught
+throws a copy-initialized copy
+compiler could elide the copy, but isn't guaranteed to do so
+consider what happens here:
+
+	int getValueFromDatabase(Database *d, std::string table, std::string key) {
+		assert(d);
+
+		try {
+			return d->getIntValue(table, key); // throws Derived exception on failure
+		}
+		catch (Base &exception) {
+			// Write an error to some global logfile
+			g_log.logError("doSomethingImportant failed");
+
+			throw exception; // Danger: throws a Base object, not a Derived object
+		}
+	}
+
+in this case getIntValue() throws a Derived object
+but catch block catches a Base reference
+it's fine since we can have a Base reference to a Derived object
+when we throw exception, it's copy-initialized from variable exception
+it's treated as type base, so copy-initialized also has type Base not Derived
+Derived object has been sliced
+
+EX: slice.cpp
+
+c++ gives us a way to rethrow the same exception as was just caught
+just use throw keyword by itself in the catch block
+
+	int getValueFromDatabase(Database *d, std::string table, std::string key) {
+		assert(d);
+
+		try {
+			return d->getIntValue(table, key); // throws Derived exception on failure
+		}
+		catch (Base &exception) {
+			// Write an error to some global logfile
+			g_log.logError("doSomethingImportant failed");
+
+			throw; // This throws the same exception as the one that was just caught
+		}
+	}
+
+throw rethrows the exact same exception as was caught
+no copies are made, so we don't have to worry about slicing
+this method should be preferred
+Rule: When rethrowing the same exception, use the throw keyword by itself

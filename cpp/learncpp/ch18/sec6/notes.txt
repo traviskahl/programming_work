@@ -1,0 +1,80 @@
+file io in c++ works mostly the same as normal io
+there are 3 basic file io classes:
+	ifstream (derived from istream)
+	ofstream (derived from ostream)
+	fstream (derived from iostream)
+they do input, output, and input/output respectively
+must #include the fstream.h header
+
+unlike cout, cin, cerr, and clog file streams must be explicitly set up by user
+very simple: to open file, create object of the appropriate file io class
+file name is parameter
+use << or >> to read/write to the file
+when we're done, several ways to close a file
+	call close()
+	just let io variable go out of scope, destructor closes for us
+
+file output uses the ofstream class
+fairly straightforward
+
+EX: simpleout.cpp
+
+directory now has file called Sample.dat
+it has the two lines we wrote to the file
+it's also possible to use put() to write single character to file
+
+we'll take the file we wrote in the last example and read it back in
+if fstream returns a 0 we reached the end of file (EOF)
+we'll use this to determine how much we read
+
+EX: simplein.cpp
+
+output wasn't quite what we wanted
+extraction operator deals with formatted output and breaks on whitespace
+in order to read entire lines we should use getline()
+
+EX: getlinein.cpp
+
+output in c++ may be buffered
+that means anything that's output to a file stream might not get written immediately
+several output operations can be batched and handled together
+mostly for performance reasons
+when a buffer is written to disc, it's called flushing the buffer
+one way to flush the buffer is closing the file
+
+buffering isn't usually a problem but it can cause problems for the unaware
+main culprit is when there's data in the buffer and program terminates immediately
+destructors are never called, files aren't closed, buffers aren't flushed
+the data is never written and is lost
+it's always a good idea to explicitly close any open files before calling exit()
+
+can flush buffer manually using ostream::flush() or sending std::flush to output stream
+either method is useful to ensure contents of buffer are written immediately
+
+std::endl also flushed output stream
+overuse of it can have performance impacts when doing expensive flushes, like writing to a file
+programmers conscious of performance often use '\n' instead of std::endl for putting a newline in the stream
+
+what happens if we write to a file that already exists?
+file is overwritten, but what if we want to append?
+file stream constructors take an optional second parameter
+called the mode, valid flags live in the ios class
+
+mode			meaning
+app 			opens the file in append mode
+ate 			seeks to the end of the file before reading/writing
+binary 			opens in binary mode instead of text
+in 				opens file in read mode (default for ifstream)
+out 			opens file in write mode (default for ofstream)
+trunc 			erases file if it exists
+
+possible to specify multiple flags by bitwise OR (|)
+ios::in and ios::out are already defaults for ifstream and ofstream
+if you opt to use fstream, must specify which mode
+
+EX: simpleappend.cpp
+
+it's possible to explicitly close a file using close()
+it's also possible to explicitly open a file stream using open()
+works just like file stream constructors
+takes file name and optional file mode

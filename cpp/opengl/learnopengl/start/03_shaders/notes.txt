@@ -1,0 +1,191 @@
+shaders are small programs that run on the gpu
+they run for each specific action of the graphics pipeline
+very isolated, not allowed to communicate with each other
+only communication is through inputs and outputs
+
+shaders are written in c-like language glsl
+tailored for use with graphics, has features targeted at vectors and matrices
+
+always begin with a version declaration
+followed by a list of input and output variables, uniforms, and main()
+entry point is the main()
+we process inputs and output results here
+
+when we talk about vertex shaders each input var is AKA a vertex attribute
+there's a max number we're allowed to declare, limited by hardware
+opengl guarantees there's at least 16 4-component vertex attribs available
+some hardware might allow more, can check with GL_MAX_VERTEX_ATTRIBS
+	
+	int nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+
+often returns minimum of 16 which is often enough
+
+like any language glsl has data types
+has most default basic types like int, float, double, uint, and bool
+also has two container types: vectors and matrices
+
+a vector is a 1, 2, 3, or 4 component container for any of the basic types
+takes following forms (where N is the number of components)
+	vecN	default vector of N floats
+	bvecN	vector of N booleans
+	ivecN	vector of N ints
+	uvecN	vector of N unsigned ints
+	dvecN	vector of N doubles
+
+most of the time we use vecn since floats are fine for our use
+
+components can be accessed with vec.x, x is first component
+can use .x, .y, .z, or .w to get any component
+glsl lets us use rgba for colors stqp for coords
+
+vector has some interesting component selection called swizzling
+
+	vec2 someVec;
+	vec4 differentVec = someVec.xyxx;
+	vec3 anotherVec = differentVec.zyw
+	vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
+
+can use any combination of 4 letters to create new vector
+as long as original vector has those components
+can't call .z on vec2
+can also pass vectors as args to vector constructor calls
+
+	vec2 vect = vec2(0.5, 0.7);
+	vec4 result = vec4(vect, 0.0, 0.0);
+	vec4 otherResult = vec4(result.xyz, 1.0);
+
+shaders are part of a whole so we want inputs and outputs
+glsl defines the in and out keywords for this
+each shader can define inputs and outputs
+when an output matches with an input for the next shader stage it's passed along
+vertex and fragment shader are a bit different
+
+vertex shader must receive some kind of input
+receives this from the vertex data
+to define how this data's organized we specify input variables with location metadata
+so we can configure vertex attributes on the cpu
+last lesson it was with
+
+	layout (location = 0);
+
+vertex shader requires an extra layout specification for its inputs so we can link it with vertex data
+
+other exception is that fragment shader requires a vec4 color output variable
+since fragment shaders need to generate final output color
+if we don't specify one opengl renders the object as black or white
+
+if we want to send data from one shader to another we'd need to declare an output in sending shader
+also have a similar input in receiving shader
+when types and names are equal on both sides opengl links the variables
+then we can send the data
+
+EX: vshader.glsl
+EX: fshader.glsl
+
+we declared a vertexColor variable as a vec4 in both shaders
+since they have same type and name, they're linked
+great, we send data from one shader to another
+let's send data from the application to the fragment shader
+
+uniforms are another way to pass data from application to shaders
+but they're a bit different compared to vertex attribs
+uniforms are global, so they're unique per shader program object
+can be accessed from any shader at any stage along the pipeline
+whatever we set the uniform to, it'll keep the value until it's reset or updated
+
+to declare a uniform we add the uniform keyword to a shader with a type and name
+after that we use the uniform in the shader
+
+EX: uniformfshader.glsl
+
+set the fragment's output color to the content of out uniform
+they're global so we can define them in any shader we want
+but we don't use it in the vertex shader so there's no reason to define it there
+
+right now it's empty since we haven't added any data to it
+we need to find the location of the uniform
+once we have that we can update its values
+let's set it to change color over time
+
+	float timeValue = glfwGetTime();
+	float greenValue = (sin(timeValue)/ 2.0f) + 0.5f;
+	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+	glUseProgram(shaderProgram);
+	glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+retrieve running time with glfwGetTime()
+then vary color in the range of 0.0-1.0 by using sin() and storing it in greenValue
+then query for location of ourColor using glGetUniformLocation()
+supply it with shader program and name of the uniform
+
+if it returns -1, it couldn't find the location
+we can set the uniform using glUniform4f()
+
+finding the uniform doesn't require us to use the shader program first
+but updating one does
+
+opengl is a c library so it doesn't have native support for type overloading
+when a function can be called with different types opengl defines new functions
+glUniform is an example, requires a certain postfix depending on the type of the uniform
+a few possibilities
+	f 		function expects a float
+	i 		expects an int
+	ui 		expects an unsigned int
+	3f 		expects 3 floats
+	fv 		expects float/vector array
+
+when we want to configure an option, pick the function with the right type
+in this case we could've used glUniformfv() as well
+
+now we want to use the uniform for rendering
+if we want color to gradually change, we update it every render-loop iteration
+otherwise it'd maintain a solid color
+we calculate the greenValue and update uniform every iteration
+
+uniforms are pretty useful to set attribs that might change in different render iterations
+but what if we want to have a color for each vertex?
+we'd need as many uniforms as vertices
+a better solution is to include more data in vertex attributes
+
+we're going to add color as 3 floats in vertices[]
+since we have more data to send to the vertex shader, we should adjust the vertex shader
+allow it to receive the color as a vertex attribute input
+we set location of aColor attribute to 1 with layout specifier
+
+we also must reconfigure vertex attribute pointers
+now we're configuring vertex attrib on attrib location 1
+color values have size of 3 floats and we don't normalize
+since we have two vertex attribs we must recalculate stride
+to get next attrib value we must move 6 floats
+three for position values and three for color
+stride is 6 times the size of a float
+we also must specify offset, which is still 0 for vertices
+color starts after position data so it's the size of three floats away
+
+image might not be what we expect since we only supplied 3 colors
+it's the result of fragment interpolation in the fragment shader
+when rendering a triangle rasterization results in more fragments than vertices
+then it determines the positions of these fragments
+based on where they are in the triangle shape
+so it interpolates all fragment shader's input variables
+
+imagine we have a line where the upper point is green and lower point is blue
+if fragment shader is run at a point where it's 7/10 of the way to the upper point
+then the color will be 70% green and 30% blue
+
+writing compiling and managing shaders can be lots of work
+our final point on shaders will be building a shader class
+it'll read shaders from disc, compile and link them, check for errors, etc.
+also gives us a bit of an idea on how we encapsulate this data
+create it entirely in a header file
+
+EX: shader.h
+
+holds the id of the shader program
+constructor requires file paths of source code of shaders
+so we can store them on disc as simple text files
+we also add utility functions 
+use() activates the shader program, set... query a uniform and set its value
+

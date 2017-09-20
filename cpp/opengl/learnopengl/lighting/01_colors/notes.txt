@@ -1,0 +1,36 @@
+colors are represented using RGB values
+
+	glm::vec3 coral(1.0f, 0.5f, 0.31f);
+
+the color of an object is really what kind of light it reflects and absorbs
+this holds true in opengl as well
+light sources can have color
+if we multiply the light's color with the object's color, we get the color the object reflects
+
+	glm::vec3 lightColor(1.0f, 1.0f, 1.0f); // a white light
+	glm::vec3 toyColor(1.0f, 0.5f, 0.31f);
+	glm::vec3 result = lightColor * toyColor; // 1.0f, 0.5f, 0.31f
+
+that's with a white light, which doesn't change the color of the object
+what if we use a green light?
+
+	glm::vec3 lightColor(0.0f, 1.0f, 0.0f); // a green light
+	glm::vec3 toyColor(1.0f, 0.5f, 0.31f);
+	glm::vec3 result = lightColor * toyColor; // 0.0f, 0.5f, 0.0f
+
+instead of being a coral color, it's now a dark-greenish color
+
+we'll create visuals by simulating lighting using colors
+the first thing we need is an object to cast the light on
+we also need a light source, which will be a cube as well
+
+to draw our container we need a vertex shader
+it'll be the same as previous, without the texture
+
+we'll also need a VAO for the lamp
+could use same VAO for both objects, but isn't optimal
+
+we'll need two different fragment shaders: one for the container, one for the lamp
+the purpose of the lamp cube is to show where the light comes from
+we don't want it to change itself
+

@@ -1,0 +1,55 @@
+each object can have a material that reacts differently to light
+great for giving objects unique looks compared to other objects
+not great for flexibility with visual output
+
+most of the time objects aren't a single material but rather several
+a car has an exterior of paint, windows that partially reflect light, tires aren't shiny so don't have specular highlights
+also has diffuse and ambient colors that aren't the same for each material
+
+our previous system isn't usable for anything except the simplest models
+we need to extend it by introducing diffuse and specular maps
+let us influence diffuse and specular components with more precision
+
+we want to set the diffuse color for each individual fragment
+where we can retrieve a color value based on its position on an object
+it's textures, we want to use textures
+it's the same principle: use an image wrapped around an object that we can index for unique color values per fragment
+in lighted scenes it's called a diffuse map
+since a texture image represents all of the objects diffuse colors
+
+using a diffuse map is the same as textures
+however we store it as a sampler2D inside the Material struct
+replace the diffuse vec3 with diffuse map
+
+we'll need texture coords again in fragment shader so we have another input variable
+then we sample from the texture to get its diffuse color value
+set ambient material color to diffuse color as well
+and we're good to go
+
+we need to update vertex data with texture coords
+has vertex positions, normal vectors, and texture coords
+
+as is the specular highlight looks off
+the wood is reflecting light, but it really shouldn't
+we could set specular material of that object to vec3(0.0)
+but the steel also wouldn't show specular highlights, which it should
+
+we can use a texture map for specular highlights
+we need a black and white texture that defines specular intensities for each part of the object
+intensity of specular hightlight is retrieved by brightness of each pixel
+the closer to white a pixel is, the higher its specular component
+
+all of the parts that are wood are converted to black in our specular map
+since it should have no specular highlights
+can use photoshop or gimp to make them
+
+a specular map is like any other texture so code is similar to diffuse map code
+load the image and generate a texture object
+we need to use a different texture unit
+update material properties of fragment shader to accept a sampler2D as specular component
+then sample specular map to retrieve fragment's corresponding specular intensity
+
+with specular maps we can get lots of detail
+now our object looks more like an actual wood container
+we can also use other texture maps
+like a normal/bump map or a reflection map

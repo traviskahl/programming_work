@@ -1,0 +1,36 @@
+all overloaded operators so far have let us define the type of the operators parameters
+but not the number of parameters, that's fixed based on the operator itself
+operator== will always take two parameters, operator! always takes one
+operator() is unique because it lets us vary the type and number of parameters
+
+two things to keep in mind
+first operator() must be implemented as a member function
+second, in non-object oriented c++ operator() is used to call functions
+but with classes it's just a normal operator, using calls a function
+
+let's say we have a class that's a matrix
+they're important in linear algebra and used for geometric modeling, 3d graphics, etc
+but here it'll be implemented as a 4 by 4 two dimensional array of doubles
+to access it we could use the subscript operator
+but we want a two-dimensional array, and we can't have two subscripts
+operator() can take as many parameters as we want, so we can access the array using this
+we can also overload it in such a way that it takes no parameters at all
+
+EX: matrix.cpp
+
+since it's so flexible it's tempting to use operator() for many different uses
+but it's STRONGLY discouraged since the () operator doesn't give much indication to what it should do
+in our example it'd be better to write the erase functionality as a function called clear() or erase()
+because a line that says matrix.erase() is perfectly clear, as oppposed to matrix() which could do anything
+
+operator() is commonly used to implement functors (or function objects)
+they're classes that operate like functions
+the advantage of a functor over a normal function is that they can store data
+
+EX: functor.cpp
+
+it looks like a normal function call, but it's really storing a value
+why couldn't we have done the same thing with a normal function and a static local variable?
+we could, but functions only have one global instance
+so we'd be stuck using it for one thing at a time
+with functors we can make as many as we want and use them at the same time

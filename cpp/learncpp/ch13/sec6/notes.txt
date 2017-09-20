@@ -1,0 +1,41 @@
+it's possible to specialize functions to provide different functionality for specific types
+it's also possible to specialize an entire class
+
+here's a class that stores 8 objects
+
+EX: simple.cpp
+
+class is functional, but implementation of Storage8<bool> is inefficient
+since all variables must have an address and CPU can't assign anything smaller than a byte all variables must be 1 byte in size
+so a bool uses an entire byte even though it only needs one bit
+so our Storage8<bool> class uses 1 byte and wastes 7
+
+by using some bit logic we can compress all into a single byte
+but we need to revamp the class when used with bool
+we could create a new class, but it'd be mostly similar
+and anyone using it would have to remember two different classes
+c++ provides class template specialization which solves this problem
+
+class template specialization lets us specialize a class for a data type
+in this case we create a specialization for Storage8<bool>
+it takes precedence over the generic Storage8<T>
+similar to function specialization
+
+they're treated as completely independent classes, even though they're allocated the same way as templated class
+so we can change anything about the specialized class
+
+EX: specialize.cpp
+
+we start with template<> so there aren't any template parameters
+next we add <bool> to the class name specifying we're specifying
+everything else is implementation details
+to know how it works you would need to understand bitwise operators
+
+the specialized class uses one unsigned char instead of an array of 8 bools
+
+when we declare a Storage8 of anything that's not a bool we get a version based on the generic type
+if it's of type bool, we get specialized version
+we kept the public interface (functions) the same, but we don't have to
+we can add, change, or remove functions in Storage8<bool> as we see fit
+but keeping it the same keeps everything consistent, so front-end users don't need more specific knowledge
+keeping it consistent is recommended, but not necessary

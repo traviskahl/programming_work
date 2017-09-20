@@ -1,0 +1,30 @@
+1) What values does this program print? Assume a short is 2 bytes, and a 32-bit machine.
+	
+short value = 7; // &value = 0012FF60
+short otherValue = 3; // &otherValue = 0012FF54
+ 
+short *ptr = &value; // this assigns ptr to the memory address of value, which is 0012FF60
+ 
+std::cout << &value << '\n'; // this prints the location of value: 0012FF60
+std::cout << value << '\n'; // this prints the value of value: 7
+std::cout << ptr << '\n'; // this prints the value of ptr, which is the address of value: 0012FF60 
+std::cout << *ptr << '\n'; // this dereferences ptr, prints the value at the address ptr holds, the value of value: 7
+std::cout << '\n'; // just a new line
+ 
+*ptr = 9; // this assigns the value at the address of ptr to 9, also changes value to 9
+ 
+std::cout << &value << '\n'; // prints the location of value: 0012FF60
+std::cout << value << '\n'; // prints the value of value: 9
+std::cout << ptr << '\n'; // prints the memory address held in ptr: 0012FF60
+std::cout << *ptr  << '\n'; // dereferences ptr, the value of value: 9
+std::cout << '\n'; // just a newline
+ 
+ptr = &otherValue; // this assigns ptr the memory address of otherValue: 0012FF54
+std::cout << &otherValue << '\n'; // this prints the location of otherValue: 0012FF54
+std::cout << otherValue << '\n'; // this prints the value of otherValue: 3
+std::cout << ptr << '\n'; // this prints the location stored in ptr: 0012FF54
+std::cout << *ptr << '\n'; // this dereferences ptr, the value of otherValue: 3
+std::cout << '\n'; // just a newline
+ 
+std::cout << sizeof(ptr) << '\n'; // ptr is a pointer to a short, so it has a size of 4 bytes
+std::cout << sizeof(*ptr) << '\n'; // the value stored at ptr is a short, so it has a size of 4 bytes

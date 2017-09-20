@@ -1,0 +1,20 @@
+when writing reusable code error handling is absolutely needed
+one common way is through return codes
+it's simple, but it has some drawbacks
+returning values can be cryptic
+if the function returns -1, is it an error or a valid value?
+functions can only return one value
+value would have to be passed by a reference value, which is unintuitive
+in sequences where many things can go wrong, error codes must be checked constantly
+return codes and constructors don't mix well
+what if we create an object and something in the constructor misfires?
+they can't return anything, and passing something back by reference is messy
+even so, the object is still created
+finally when an error is returned to the caller the caller might not be ready to handle it
+if the caller doesn't want to handle the error it has to ignore it (which loses it)
+or they can return it farther up the stack
+leads to the same issues as above
+
+exceptions solve these problems
+provide a mechanism to separate handling of errors from the normal flow of code
+allows more freedom to handle errors when and however is most useful

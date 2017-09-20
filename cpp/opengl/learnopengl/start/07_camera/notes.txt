@@ -1,0 +1,197 @@
+opengl doesn't know what a camera is
+but we can simulate one by moving everything in the reverse direction
+it gives the illusion of making us move
+
+when we talk about camera space we talk about vertex coords as seen from the camera
+view matrix transforms world coords into view coords that're relative to camera
+to define a camera we need its position, direction, and vectors looking to the right and up from the camera
+
+getting camera position is easy
+just a vector in world space
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+at first we let the camera point at the world origin
+that's (0, 0, 0)
+subtracting camera's vector from scene's origin vector gives us our direction vector
+
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+next we need a right vector, represents positive x-axis of camera space
+we specify an up vector and do a cross product on it with the direction vector
+gives a vector that points in the positive x-axis direction
+
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+then we need an up axis 
+take the cross product of right and direction vector
+
+	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+by defining a coord space with 3 perpendicular axes, we can create a matrix with them
+add a translation vector and we can transform any vector to that coord space
+do this by multiplying by the matrix
+the LookAt matrix does this, now we can create it
+
+	LookAt = 	Rx	Ry	Rz	0		1	0	0	-Px
+				Ux	Uy	Uz	0		0	1	0	-Py
+				Dx	Dy	Dz	0	*	0	0	1	-Pz
+				0	0	0	1		0	0	0	1
+
+R is right vector
+U is up vector
+D is direction vector
+P is camera's position vector
+P is inverted since we move the world in the opposite direction
+
+glm does this work for us
+we just specify camera position, target position, and up vector
+
+	glm::mat4 view;
+	view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+					   glm::vec3(0.0f, 0.0f, 0.0f),
+					   glm::vec3(0.0f, 1.0f, 0.0f));
+
+before going to user input let's rotate camera around the scene
+use trig for this by creating x and z coords for each frame that represent a point on a circle
+use them for camera position
+
+	float radius = 10.0f;
+	float camX = sin(glfwGetTime()) * radius;
+	float camZ = cos(glfwGetTime()) * radius;
+	glm::mat4 view;
+	view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+moving a camera around is good but we want to move it ourself
+to set up a camera system we should define some variables
+
+	glm::vec3 cameraPos	= glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+also changes lookAt function call
+let's change these variables with user input
+can just change the processInput function
+
+now when we press WASD camera's position is changed
+to move forward or backwards we add or subtract direction vector from position vector
+to move sideways we do cross product to create a right vector
+then move along that accordingly
+
+note that we normalize that right vector
+if we didn't then the cross product might return differently sized vectors
+we'd either move more slowly or quickly based on camera orientation
+but we want a consistent movement speed, so we must normalize
+
+right now we have a flat value for move speed
+in theory that's fine but people have different processing speeds
+some people can draw more frames than others each second
+therefore they call processInput() more often, and move faster
+we want to make sure our program performs the same on every system
+
+programs with graphics often keep track of a deltatime variable
+stores the time it takes to render the last frame
+then multiply all velocities by this
+so when we have a large deltatime in a frame, it took longer than average
+velocities are made larger to compensate
+we use two global variables to handle this
+
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
+
+in each frame we calculate a new deltaTime
+
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame = lastFrame;
+	lastFrame = currentFrame;
+
+and edit our cameraSpeed in terms of deltaTime
+
+keyboard movement is great, but we want to look with the mouse
+we need to change cameraFront based on mouse input
+but changing direction vector based on mouse rotation is complicated and requires trig
+good thing i took trig twice!
+
+Euler angles are 3 values that represent any rotation in 3d
+defined by Leonhard Euler in the 1700's
+they are:
+
+	pitch: rotate around x-axis
+	yaw: rotate around y-axis
+	roll: rotate around z-axis
+
+pitch is how much we look up or down
+yaw is how far to the right or left we look
+roll isn't used much in first person, it's like a plane though
+
+given a pitch and yaw we can convert them into a 3d vector that represents a new direction
+process of conversion requires trig
+here's a simple case: imagine a right triangle with a hypotenuse of 1
+legs are of length sin(y) and cos(x)
+we have some general formulas now for getting length in x and y directions
+
+	direction.y = sin(glm::radians(pitch));
+	direction.x = cos(glm::radians(pitch));
+	direction.z = cos(glm::radians(pitch));
+
+that's with pitch, but can we factor in yaw as well?
+
+	direction.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+
+now we can convert our pitch and yaw values into direction vectors
+but how can we get these values?
+
+they're obtained from mouse or controller movement
+horizontal mouse movement affects yaw
+vertical movement affects pitch
+idea is to store last frame's mouse positions and in current frame we calculate how much it changed
+the higher the difference the more we update the pitch or yaw value
+the more the camera will move
+
+first we tell GLFW to hide the cursor and capture it
+capturing means once the window has focus it doesn't lose the mouse
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+then to calculate pitch and yaw we need to tell glfw to listen for mouse movement
+create a callback function
+	
+	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+and register it
+
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+to handle mouse input for an fps-style camera there's several steps to take
+
+	1. calculate mouse's offset since the last frame
+	2. add offset values to camera's yaw and pitch values
+	3. add some constraints to max and min values 
+	4. calculate direction vector
+
+first have to store last mouse positions in program
+we initialize to center of screen
+
+	float lastX = 400, lastY = 300;
+
+then calculate difference between last and current frame
+multiply offsets by a sensitivity value
+if we omit this multiplication mouse movement would be too strong
+
+then add offset values to globally declared pitch and yaw values
+
+third we add constraints to camera so user can't make weird movements
+can't look higher than 89 degrees, lower than -89 degrees
+no constraint on yaw, but there could be
+
+last step is to calculate direction vector
+use same formulas as above
+
+we can also add a zooming interface
+change the FOV using scroll wheel
+also have a callback function for this
+

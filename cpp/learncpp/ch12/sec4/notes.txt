@@ -1,0 +1,44 @@
+when a c++ program is executed it's executed sequentially
+starts at top of main()
+when function is called, point of execution jumps to beginning of function being called
+how does it know to do this?
+
+when program is compiled, compiler converts each statement into lines of machine language
+each line is given its own unique sequential address
+same for functions: each is given its own address
+binding is the process that's used to convert identifiers (names for functions/variables) into addresses
+binding is used for both functions and variables, but here we'll focus on functions
+
+most function calls are direct function calls
+a direct function calls is a statement that directly calls a function
+
+	printValue(5);
+
+can be resolved using early binding
+sometimes called static binding, it means compiler (or linker) can associate name with machine address
+when compiler encounters function call, replaces it with machine language instruction that tells CPU to jump to address of function
+simple calculator program that uses early binding
+
+EX: early.cpp
+
+since add() subtract() and multiply() are direct function calls compiler uses early binding
+replaces add() with instruction that tells CPU to jump to address of add() function
+does same for subtract() and multiply()
+
+in some programs it's not possible to know which function will be called until runtime
+know as late binding (or dynamic binding)
+in c++ one way to get late binding is through function pointers
+points to function instead of variable
+
+	int (*pFcn)(int, int) = add;
+
+using this is known as an indirect function call
+
+EX: late.cpp
+
+instead of calling functions directly we set pFcn to point at the function we want
+compiler can't use early binding because it doesn't know what to point to at compile time
+
+late binding is slightly less efficient
+however it's more flexible because decisions don't need to be made until run time
+late binding is used to implement virtual functions

@@ -1,0 +1,9 @@
+lots of programs use the same things
+rewriting these containers, algorithms, etc. leads to errors
+CPP comes with a library with lots of reusable classes
+called the Standard Template Library: STL
+
+a collection of classes that provide templated containers, algorithms, and iterators
+if you need a commonly used algorithm or container, STL probably has it
+it's good because we can reuse this code and is pretty efficient
+it can be bad because it's very complex

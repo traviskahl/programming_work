@@ -1,0 +1,25 @@
+positive (+), negative (-), and logical not (!) are unary operators
+they only operate on the object they're applied to
+because of this they're usually implemented as member functions
+they're all implemented in an identical manner
+
+EX: cents.cpp
+
+overloaded operator- is a unary operator implemented as a member function
+so it takes no parameters
+returns a Cents object that's the negation of the original Cents value
+operator- doesn't modify the Cents object, so we can and should make it a const function
+
+there's no confusion here between negative operator and minus operator
+since they have different number of parameters
+
+! operator is the logical negation operator
+if an expression evaluates to true, operator! returns false and vice-versa
+it's usually applied to boolean variables to test for true values or not
+
+for integers, 0 is false and everything else is true
+so operator! applied to integers returns true if it's 0 and false otherwise
+
+so we can say that operator! should evaluate to true if the state of the object is "false" "zero" or whatever else
+
+EX: point.cpp

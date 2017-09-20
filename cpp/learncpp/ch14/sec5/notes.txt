@@ -1,0 +1,119 @@
+so far we've only seen exceptions used in non-member functions
+they're equally useful in member functions
+even more so in overloaded operators
+consider following overloaded operator[]
+
+	int& IntArray::operator[](const int index) {
+		return m_data[index];
+	}
+
+works well - if index is valid
+lacks good error checking
+could add assert statement
+
+	int& IntArray::operator[](const int index) {
+		assert (index >= 0 && index < getLength());
+		return m_data[index];
+	}
+
+now if an invalid index is passed, program causes assertion error
+but sometimes the best course of action is to fail silently and let caller know something went wrong
+sadly overloaded operators have specific requirements as to number and type of parameters
+this tosses out returning error codes
+but exceptions don't change signature of functions, so we can use them
+
+	int& IntArray::operator[](const int index) {
+		if (index < 0 || index >= getLength())
+			throw index;
+
+		return m_data[index];
+	}
+
+now if user passes in invalid index, operator[] throws int exception
+
+constructors are another area where exceptions are useful
+if a constructor fails, just throw an exception to indicate object failed to create
+construction is aborted, destructor is never executed
+but exception handler should handle any necessary cleanup
+
+one problem with using basic data types like int is that they're vague
+a bigger problem is understanding what exceptions mean when there's multiple statements or functions calls in one try block
+if we catch int exception, what does it tell us?
+was an array index out of bounds?
+was there integer overflow?
+did operator new run out of memory?
+there's sometimes no easy way to tell
+
+one way to solve this is using exception classes
+exception class: a class that's designed specifically to be thrown as an exception
+
+EX: classes.cpp
+
+using a class we can have exception return a description of problem that occurred
+provides context for what went wrong
+since ArrayException is its own unique type, we can catch exceptions thrown by array class
+and treat them differently from other exceptions
+
+handlers should catch class exceptions by reference, not value
+prevents compiler from making copy of exception and prevents object slicing
+catching by pointer should be avoided unless you have a compelling reason
+
+possible to throw classes as exceptions, and classes can inherit from other classes
+we should consider what happens when we use inherited classes as exceptions
+they won't just match classes of a specific type, but also classes derived from that type
+
+EX: inherit.cpp
+
+we throw exception of type Derived
+but it's caught as type Base
+derived classes will be caught by handlers for the base type
+Derived is-a Base in this example
+when c++ tries to find a handler it does so sequentially
+first thing it does is check if Derived is-a Base
+it is, so that catch block executes
+catch block for Derived is never touched in this example
+to fix this, we should flip the order of catch blocks
+
+Rule: handlers for derived exception classes should be listed before those for base classes
+
+many classes in standard library throw exception classes on failure
+operator new and std::string can throw std::bad_alloc if they can't allocate memory
+failed dynamic_cast throws std::bad_cast
+as of c++14 there are 21 exception classes
+c++17 adds more
+
+all are derived from std::exception
+small interface class designed to serve as base class to any exception thrown by c++ standard library
+when an exception is thrown by the standard library, we mostly don't care what it is
+we just care that something went wrong
+thanks to std::exception, we can set up an exception handler to catch exceptions of type std::exception
+we can catch std::exception and all of its derivatives
+
+EX: std.cpp
+
+should be noted that std::exception has virtual member function named what()
+returns c-style string description of the exception
+most derived classes override what() to change the message
+the string is meant to be used for descriptive text
+not guaranteed to be same across compilers
+
+sometimes we want to handle a specific type of exception differently
+we can add a handler for just that type and let the others fall through
+add handler for std::bad_alloc and also for std::exception
+std::bad_alloc will be treated differently than the others
+
+inheritance hierarchies like this let us use specific handlers or generic ones
+gives us a fine degree of control over exceptions
+
+nothing throws std::exception directly
+neither should we
+we can throw its derivatives in the standard library if we need to
+std::runtime_error is popular
+it has a generic name and its constructor takes a customizable message
+
+EX: runtime.cpp
+
+we can also derive our own classes from std::exception
+also override virtual what()
+
+EX: derived.cpp

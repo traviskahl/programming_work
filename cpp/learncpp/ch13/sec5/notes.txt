@@ -1,0 +1,22 @@
+when we create a function template instance the compiler stencils a copy of the template function
+replaces template type parameters with actual types used in variable declaration
+any given function has same implementation even with different data types
+mostly desired, but we can implement a template function different for a specific data type
+we do this with template specialization
+
+EX: simple.cpp
+
+if we want double value (and only double values) to output in scientific notation
+we use template specialization to create a specific version of print() for doubles
+define the specialized function, replacing the template type with specific type we want to redefine
+if the function is a member function, define it outside the class definition
+
+another example: holding the datatype char*
+without specialization it does a shallow copy of the string
+when we delete[] string, we delete value that m_value was pointing at
+
+can fix it through specialization
+redefine the constructor to do a deep copy
+also redefine destructor to solve the memory leak
+
+can also specialize non-member template functions in same manner

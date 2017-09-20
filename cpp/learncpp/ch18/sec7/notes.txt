@@ -1,0 +1,76 @@
+each file stream class has a file pointer that's used to keep track of the current r/w position in the file
+when something's read or written it happens at the pointer's current location
+by default when opening a file the pointer is set to the beginning
+if it's opening in append mode the pointer is moved to the end of the file
+it's so writing doesn't override anything else in the file
+
+all file access so far has been sequential
+we've read or written the contents in order
+it's also possible to do random file access
+skip to different points in the file arbitrarily
+useful if file's full of records and we only want one
+instead of reading all of them, we can skip directly to the record we want
+
+random file access is done by manipulating the file pointer
+done through seekg() for input and seekp() for output
+g stands for get and p stands for put
+
+they take two parameters
+first is offset that determines how many bytes to move the file pointer
+second is an ios flag that specifies what the offset should be from
+
+flag 			meaning
+beg 			offset is relative to beginning of file (default)
+cur 			offset is relative to current location of file pointer
+end 			offset is relative to end of file
+
+positive offset means move the file pointer towards the end of the file
+negative means move it towards the beginning
+examples:
+
+inf.seekg(14, ios::cur); // move forward 14 bytes
+inf.seekg(-18, ios::cur); // move backward 18 bytes
+inf.seekg(22, ios::beg); // move to 22nd byte in file
+inf.seekg(24); // move to 24th byte in file
+inf.seekg(-28, ios::end); // move to the 28th byte before end of file
+
+moving to beginning or end is easy
+inf.seekg(0, ios::beg); // move to beginning
+inf.seekg(0, ios::end); // move to end
+
+example using seekg() and input file from last lesson
+
+EX: seekg.cpp
+
+tellg() and tellp() are also useful
+they return the absolute position of the file pointer
+can be used to determine size of a file:
+ifstream inf("Sample.dat");
+inf.seekg(0, ios::end); // move to end of file
+cout << inf.tellg();
+
+tells us how long the file is in bytes
+
+fstream class can read and write at same time
+but it isn't possible to switch between reading and writing arbitrarily
+once a read or write has taken place, you can only switch by performing an operation that modifies file position
+that's by doing a seek
+if we don't want to actually move, we can seek the current position
+	iofile.seekg(iofile.tellg(), ios::beg);
+if we don't, weird things happen
+also doing while (inf) doesn't work with fstream
+
+example using fstream
+it will open a file, read the contents, and change any vowels to a #
+
+EX: fstream.cpp
+
+to delete a file, use the remove() function
+the is_open() function returns true if the stream is currently open, false otherwise
+
+while streaming variables to a file is easy it becomes more complex with pointers
+remember a pointer just holds an address
+although it's possible to read and write addresses to disc, it's dangerous to do so
+a variable's address will probably differ on multiple executions
+it probably won't be there when you come back
+don't write addresses to file

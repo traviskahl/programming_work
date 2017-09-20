@@ -1,0 +1,79 @@
+let's return to smart pointer classes
+smart pointers are classes that manage a dynamically allocated object
+it ensures that the object is deallocated properly
+
+they should never be dynamically allocated themselves
+by allocating statically, we can guarantee that the smart pointer is deallocated itself
+
+CPP11 has four smart pointer classes
+	std::auto_ptr (which is removed in CPP17 because it sucks)
+	std::unique_ptr
+	std::shared_ptr
+	std::weak_ptr
+
+std::unique_ptr is the replacement for std::auto_ptr
+use it to manage any dynamically allocated object that isn't shared by multiple objects
+it should completely own any object it manages
+it's in the <memory> header
+
+EX: simple.cpp
+
+std::unique_ptr uses move semantics properly
+
+EX: move.cpp
+
+since std::unique_ptr is made with move semantics in mind, copy semantics is disabled
+therefore we need to use std::move
+
+std::unique_ptr has overloaded operator* and operator->
+operator* returns a reference to the resource it holds
+operator-> returns a pointer
+std::unique_ptr might not have a resource to manage
+	either due to being created empty
+	or because it was moved to another std::unique_ptr
+we should check to see if the std::unique_ptr has an object before trying to access it
+it has a cast to bool to easily check if it's null
+
+EX: check.cpp
+
+in addition, std::unique_ptr is smart enough to know to use scalar or array delete
+it's fine to use with single objects or arrays
+but you should still use std::vector, std::array, or std::string for handling arrays
+
+CPP14 includes a function called std::make_unique
+it makes an object of the templated type, and initializes it with the passed args
+
+EX: make_unique.cpp
+
+use of this is optional, but preferred over using std::unique_ptr ourselves
+the code is simpler and requires less typing when using auto keyword
+it also solves an exception safety issue
+
+consider this expression
+some_function(std::unique_ptr<T>(new T), function_that_can_throw_exception());
+the compiler is given flexibility in how it handles this
+it could create a new T, then call the function, then create the std::unique_ptr
+but if the function throws the exception, the new T is never deallocated, and we have a memory leak
+std::make_unique doesn't suffer from this because the creation of the object and the wrapper happen in the same place
+
+std::unique_ptr can be returned by value
+move semantics is automatically used
+it's much safer than returning raw pointers
+don't return std::unique_ptr by pointer or reference (unless you have a specific reason)
+
+pass a std::unique_ptr by const reference if you want to use it without moving ownership
+
+EX: passing.cpp
+
+if you want to move ownership, pass by value using std::move
+
+EX: owner.cpp
+
+you can use std::unique_ptr as a composition member
+so you don't have to worry about the destructor deleting the data member
+but if the class itself is dynamically allocated even smart pointers can't save you
+
+two main ways to abuse std::unique_ptr, but can be easily avoided
+1. make sure not to let two classes manage the same resource
+2. don't manually delete the resource that's being managed
+using std::make_unique prevents both of these from happening

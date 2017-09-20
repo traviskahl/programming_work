@@ -1,0 +1,41 @@
+virtual functions are one of the most important aspects of inheritance
+why do we need them?
+when we create a derived class, it's actually multiple parts
+one part for each inherited class and one for itself
+
+EX: inherit.cpp
+
+created Derived object contains Base part (constructed first) and Derived part
+inheritance implies an is-a relationship
+a Derived is-a Base
+
+we can set Derived pointers and references to Derived objects
+but since Derived has a Base part, we can set a Base pointer or reference to a Derived object
+
+result might not be as expected
+because rBase and pBase are Base refs and pointers, they only see members of Base
+even though Derived::getName() hides Base::getName() for Derived objects, the Base objects don't see it
+they call Base::getName() instead
+it's also not possible to call Derived::getValueDoubled()
+they can't see ANYTHING in Derived
+another example:
+
+EX: animal.cpp
+
+we have same issue
+because pAnimal is a pointer, it can only the Animal part of the class
+pAnimal->speak() calls Animal::speak() instead of cat::Speak()
+
+why do we need to create pointers to base classes?
+if we want a function that prints every animal's name and sound
+without using a pointer, we'd need a different function for every type of Animal
+simple with 2, but too much work with 30
+every time we added another, we'd have to remember to add another function
+since only difference is type of parameter, it's a waste of time
+however we can just have an Animal as an argument
+the problem is that they call Animal::speak() but that's solvable
+
+if we want to have different animals in the same array we have the same problem
+the array is of type Animal, and we can store any derived classes in there as well
+it'll still call Animal::speak()
+that's what virtual functions are for

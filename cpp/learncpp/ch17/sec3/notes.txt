@@ -1,0 +1,54 @@
+iterator: an object that traverses (iterates over) a container
+many classes like lists and associative containers are primarily accessed by iterators
+
+think of it as a pointer that points at a given element that also has overloaded operators
+
+operator* : dereferences the iterator and returns the element it points at
+operator++ : moves to the next element in the container
+			 usually also has operator-- to move to the previous element
+operator== and operator!= : used to determine if two iterators point to the same element
+							to compare values, dereference them both then use these operators
+operator= : assign the iterator to a new position
+			usually start or end
+			dereference first, then use assignment operator
+
+every container also has four basic member functions to use with operator=
+	begin(): return an iterator representing the beginning of the elements
+	end(): return an iterator representing the element just past the end
+	cbegin(): returns a const (read-only) iterator representing the beginning
+	cend(): returns a const iterator representing the element just past the end
+
+seems odd that end() doesn't point to the last element
+done to make looping easy
+just go until you hit end() then you're done
+
+all containers provide at least two types of iterators
+	container::iterator: provides a read-write iterator
+	container::const_iterator provides read-only iterator
+
+an example of iterating through a vector
+
+EX: vector.cpp
+
+now do the same thing with a list
+
+EX: list.cpp
+
+nearly identical to the vector program
+but the implementation of vectors and lists are very different
+
+example of iterating through a set
+
+EX: set.cpp
+
+populating the data structure is different
+but iterating through is pretty much identical
+
+iterating through maps is a bit trickier
+use make_pair() function to create pairs (crazy huh)
+std::pair allows access to elements of the pair via first and second data members
+in our map we use first as the key and second as the value
+
+EX: map.cpp
+
+we don't even need to know how map stores data to iterate through it

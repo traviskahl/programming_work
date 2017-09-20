@@ -1,0 +1,23 @@
+template type parameters aren't the only template parameters
+template classes (but not functions) can use expression parameters
+
+template expression parameter is a special type of parameter
+doesn't substitute for a type but is replaced by a value
+can be:
+	value with integral type or enumeration
+	pointer or reference to class object
+	pointer or reference to a function
+	pointer or reference to a class member function
+
+EX: StaticArray.cpp
+
+we create a static array class that takes a type parameter and an expression parameter
+type parameter controls type of data in array
+expression parameter controls how large it is
+
+it's notable that we don't actually need to dynamically allocate m_array member variable
+it's because for any instance of the class, size is constant
+when we initialize a StaticArray<int, 12>, compiler replaces size with 12
+so m_array is int[12], which can be allocated statically
+
+expression parameters are used by std::array

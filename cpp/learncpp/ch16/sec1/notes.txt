@@ -1,0 +1,13 @@
+many programs use the same concepts over and over
+loops, strings, arrays, sorting, etc.
+writing programs using non-class versions of containers and algorithms can have many errors
+
+c++ comes with a library with many reusable classes for us to build programs with
+called the c++ standard template library (STL)
+it's a collection of classes that have templated containers, algorithms, and iterators
+if we need a common class or algorithm, STL probably has it
+we can use these without needing to write the classes ourselves
+all the classes are reasonably efficient
+however the STL is fairly complex and might be intimidating since everything is templated
+
+we can engage the STL in small parts and ignore the rest until we need it

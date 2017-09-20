@@ -1,0 +1,1 @@
+1) Fix the “reductive case” program so that the Resource is properly deallocated.

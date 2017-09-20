@@ -1,0 +1,23 @@
+overloading comparison operators is relatively simple
+they follow the same patterns as we've seen in overloading other operators
+they're binary operators that don't modify their left operands
+so we implement them as friend functions
+
+EX: car.cpp
+
+example should be fairly straightforward
+since result of operator!= is opposite of operator== we can define one in terms of the other
+keeps things simpler, more error free, and reduces the code we need to write
+
+doesn't make sense to overload operator> or operator< for a Car class
+how could one car be greater than or less than another car?
+so it's better to not include them since it's not clear what they'd do
+instead we could add them to a Cents class
+
+EX: cents.cpp
+
+notice there's some redundancy here
+operator< and operator<= are logical opposites
+so one can be defined in terms of the other
+in this case we chose not to because functions are so simple
+and comparison operator in function name line up with comparison operator in return statement

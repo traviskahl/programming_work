@@ -1,0 +1,46 @@
+increment and decrement overloading is simple but has one caveat
+there's actually two versions of increment and decrement: prefix and postfix
+they're both unary and modify operands, so they're best done as member functions
+
+prefix increment and decrement are overloaded exactly the same as any unary operator
+
+EX: prefix.cpp
+
+digit class holds a number between 0 and 9
+overloaded increment and decrement so the increment/decrement the digit
+it wraps around if the digit is out of range
+we return *this because they return the implicit *this object so multiple operators can be chained together
+
+normally functions can be overloaded when they have the same name but different number/type of parameters
+but prefix and postfix increment/decrement have a problem
+both have same name, are unary, and take one parameter of the same type
+how can we differentiate
+
+c++ uses a dummy variable for postfix operators
+it's a fake parameter that only distinguishes postfix from prefix
+
+EX: postfix.cpp
+
+there's some interesting stuff happening here
+we distinguish prefix from postfix by providing a dummy integer parameter
+since it's not even used in the implementation, we don't give it a name
+tells the compiler to treat it as a placeholder, so it won't give us a warning about not using it
+
+prefix and postfix do the same job: incrementing or decrementing
+difference between the two is in what they return
+prefix operators return the object after it's been incremented or decremented
+so it's straightforward to overload them
+just change the value and return *this
+
+postfix must return the state of the object before it was incremented or decremented
+leads to a problem: if we change the object, we can't return the state of the object before it was changed
+but if we return the value before it's changed, it doesn't get changed at all
+
+the normal solution is to use a temporary variable that holds the value of the object before it was changed
+then the object can be changed and temporary variable is returned
+so the caller gets a copy of what the object was, but it's still changed
+this means the return type can't be a reference, because whatever it would reference is destroyed when the function terminates
+also, postfix is a bit less efficient than prefix, since we create a new variable and return by value instead of ref
+
+we wrote the postfix operators to call the prefix operators to do most of the work
+cuts down on duplicate code and makes it easier to modify

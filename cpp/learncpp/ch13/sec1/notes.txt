@@ -1,0 +1,86 @@
+functions and classes are powerful and flexible
+but they can also be limiting because we must specify all parameter types
+if we want a function that calculates the maximum of two numbers
+	
+	int max(int x, int y) {
+		return (x > y) ? x : y;
+	}
+
+this works great, but only for integers
+what if we later need it to work for doubles as well?
+the answer is usually to overload the function
+
+	double max(double x, double y) {
+		return (x > y) ? x : y;
+	}
+
+the implementation is exactly the same
+it works for many different types: chars, ints, doubles, and classes with overloaded >
+but because variables must be specific types, we're stuck with one function for each different type
+
+having to overload functions with the same implementation is a headache
+it wastes too much time
+it also violates the general principle that code shouldn't be reused as much as possible
+it'd sure be nice if we could write one version that works with parameters of any type
+we can because of templates
+
+dictionary definition of template: a model that serves as a pattern for creating similar objects
+we only need to create a template once, then use it as many times as we like
+function templates are functions that serve as a pattern for creating other similar functions
+the general idea is that they create a function without needing to specify the exact type of some or all variables
+we define it with placeholder types, called template type parameters
+
+when we call a templated function the compiler stencils out a copy of the template
+it replaces the generic types with actual types from the function call
+making them is fairly simple
+
+	int max(int x, int y) {
+		return (x > y) ? x : y;
+	}
+
+in this example there are 3 places where specific types are used
+we replace them with placeholder types
+since we have one different data type, we only need one template type parameter
+we also need to tell the compiler that it's a template definition
+as well as the name of our placeholder type
+we do both in one line, the template parameter declaration
+
+	template <typename T>
+	T max(T x, T y) {
+		return (x > y) ? x : y;
+	}
+
+we start with the word template
+it tells the compiler what comes next is the template paramter declaration
+we place parameters in angled brackets
+then use the keyword typename OR class
+in this context there's no difference
+if we use class the type passed in doesn't actually need to be a class
+then name the type (usually T)
+
+if the template function uses multiple templated parameters, separate them with commas
+
+	template <typename T1, typename T2>
+
+since the type passed in through templates could be a class, make them const references
+
+	template <typename T>
+	const T& max(const T& x, const T& y) {
+		return (x > y) ? x : y;
+	}
+
+using them is straightforward
+just call the function like a normal function
+
+EX: templated.cpp
+
+all calls have different parameter types
+
+they do have a few drawbacks
+	some older compilers don't have good template support
+		this isn't as big a problem now as it used to be
+	template functions generate insane error messages
+		they're harder to decipher than regular ones
+	templated functions can increase compile time and code size
+
+but they're fairly minor compared to their power and flexibility

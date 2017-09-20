@@ -1,0 +1,47 @@
+c++ treats any constructor as an implicit conversion operator
+
+EX: implicit.cpp
+
+function makeNegative expects a Fraction, but gets an integer literal
+Fraction has a constructor that takes one int, so compiler implicitly converts the literal 6 to a Fraction object
+copy inits makeNegative() parameter f using Fraction(int, int) constructor
+since f is already a Fraction, return value from makeNegative() is copy constructed back to main
+
+this implicit conversion works for all kinds of initialization (direct, uniform, and copy)
+constructors eligible to be used for implicit conversion are called converting constructors
+before c++11, only constructors with one parameter could be for converting constructors
+but with new uniform initialization this was lifted and constructors with multiple parameters can be used
+
+doing implicit conversions makes sense in this case but in other cases it might not
+
+if we have a class that holds a std::string and has two different constructors
+one takes an int and sets the size of the string
+another takes a string and allocates the std::string
+if someone tries to initialize it with a char, the constructor called will be the int constructor
+that causes some unexpected results
+
+we can address this by making constructors explicit with the explicit keyword
+it's placed in front of the constructors name
+constructors made explicit won't be used for implicit conversions
+
+EX: explicit.cpp
+
+this won't compile since MyString(int) is explicit
+an appropriate converting constructor can't be found to implicitly convert 'x' to a MyString
+
+making a constructor explicit only prevent implicit conversions
+explicit conversions via casting are still allowed
+
+direct or uniform init still converts parameters to match (uniform won't do narrowing conversions, but will do others)
+Rule: consider making your constructors explicit to prevent implicit conversion errors
+
+in the MyString case we really want to completely disallow 'x' from being converted to a MyString (in any capacity)
+one way to do this is to add a MyString(char) constructor, and make it private
+but it can still be used inside the class
+
+a better way is to use the delete keyword
+
+EX: delete.cpp
+
+when function is deleted, any use of that function is a compiler error
+note that copy constructor and overloaded operators can also be deleted to prevent them from being used

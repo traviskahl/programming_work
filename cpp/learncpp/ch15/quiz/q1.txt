@@ -1,0 +1,13 @@
+1) Explain when you should use the following types of pointers.
+
+1a) std::unique_ptr
+	You should use this when a resource should be managed by only one owner.
+
+1b) std::shared_ptr
+	You should use this when one resource should be managed by multiple smart pointers.
+
+1c) std::weak_ptr
+	You should use this when you want to prevent circular references caused by std::shared_ptr.
+
+1d) std::auto_ptr
+	You should never use this. In C++17, it's not even possible to use it.

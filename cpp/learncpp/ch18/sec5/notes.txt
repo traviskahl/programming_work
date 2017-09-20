@@ -1,0 +1,120 @@
+ios_base class has several state flags
+they're used to signal various conditions that might occur using streams
+flag:
+	goodbit: everything's okay
+	badbit: some fatal error occured (like the program tried reading past the end of the file)
+	eofbit: stream reached the end of the file
+	failbit: non-fatal error occured (like the user entered letters when the program expected integers)
+
+the flags live in ios_base, but ios is derived from ios_base and is easier to type
+usually they're accessed through ios (such as std::ios::failbit)
+ios also provides member functions to conveniently access these states
+
+good(): returns true if the goodbit is set
+bad(): returns true if the badbit is set
+eof(): returns true if eofbit is set
+fail(): returns true if failbit is set
+clear(): clears all flags and restores the stream to goodbit state
+clear(state): clears all flags and sets the state flag passed in
+rdstate(): returns the currently set flags
+setstate(state): sets the state flag passed in
+
+most commonly dealt with is the failbit when user enters invalid input
+consider this:
+//cout << "Enter your age: ";
+//int nAge;
+//cin >> nAge;
+
+program expects an integer, but if user enters non-numeric data strange things happen
+cin can't extract anything and failbit will be set
+if an error occurs and the stream isn't set to goodbit, other stream operations are ignored
+can be cleared by calling clear() function
+
+input validation: the process of checking whether user input meets some set of criteria
+can be two general types: string and numeric
+
+with string validation, we accept all user input and reject based on formatting
+if we want a phone number, we might want to ensure the data has ten digits
+most languages do this through regex
+c++ doesn't have built-in regex (though it might soon) so we examine each character
+
+numerical validation, we usually want to make sure the number is in a certain range
+but the user could enter something that isn't a number, we should account for this
+c++ has many functions do determine if something is number or letter
+these live in cctype header:
+	isalnum(int): returns non-zero if param is letter or digit
+	isalpha(int): returns non-zero if param is letter
+	iscntrl(int): returns non-zero if param is control character
+	isdigit(int): returns non-zero if param is digit
+	isgraph(int): returns non-zero if param is printable but not whitespace
+	isprint(int): returns non-zero if param is printable including whitespace
+	ispunct(int): returns non-zero if param is neither alphanumeric or whitespace
+	isspace(int): returns non-zero if param is whitespace
+	isxdigit(int): returns non-zero if param is hexadecimal digit (0-9, a-f, A-F)
+
+simple case of string validation is asking user to enter name
+validation criteria: user only enters alphabet or spaces
+if anything else is encountered, input is rejected
+when it comes to variable length inputs best way to validate strings is by regex
+second best is to step through each character and ensure it meets criteria
+
+EX: simple.cpp
+
+this code isn't perfect
+user could enter name as gibberish or a bunch of spaces
+could refine validation criteria to only accept strings with at least one character and at most one space
+
+another example: ask user for phone number
+phone number is opposite of name where length is variable and criteria are constant
+instead the length is constant and criteria changes based on position
+we're going to take a different approach
+write a function that checks input against a predetermined template
+template is as such:
+	# matches any digit
+	@ matches any alphabetic character
+	_ matches any whitespace
+	? matches anything
+	otherwise, characters in input and template must match exactly
+if we ask the function to match the template (###) ###-####
+we expect the user to input (, then 3 numbers, ), space, 3 numbers, dash, 4 numbers
+if anything doesn't match, input is rejected
+
+EX: phone.cpp
+
+this lets us force the user to exactly match our format
+it's still subject to several constraints though
+if #, @, _, or ? are valid inputs, the function doesn't work
+also, unlike regexes, there's no symbol to mean the length can be variable
+a template can't be used to ensure a user enters two words separated by whitespace
+it can't handle the fact that the words are variable length
+for that a non-template approach is better
+
+when dealing with numeric input, the obvious way is to use >> to extract input
+by checking failbit we can tell if it failed or not
+
+EX: numeric.cpp
+
+if user enters a number, std::cin.fail() will be false and we hit break statement
+if user enters input starting with a letter, std::cin.fail() will be true and we go to conditional
+there's a case we haven't tested for
+when user enters a string that starts with numbers but contains letters (like 15fasdf45)
+the starting numbers are used, then the rest stays in the stream, failbit WILL NOT be set
+two problems arise:
+	if you want this to be valid input, we now have garbage in the stream
+	if we don't want this to be valid input, it's not rejected and we still have garbage in the stream
+
+first problem is easy to solve: add a std::cin.ignore(1000, '\n'); outside of the conditional
+second problem is a little harder, but previous solution gets us partway there
+we can use gcount() to determine how many characters were ignored
+if input was valid, gcount() should return 1 (the newline that was discarded)
+if it returns >1, the extraction wasn't done properly and we need new input
+
+EX: goodnum.cpp
+
+we could also read it in as a string, process the string, and convert if it passes validation
+
+EX: stringnum.cpp
+
+whether this is more or less work than extraction depends on validation parameters and restrictions
+doing input validation in c++ is lots of work
+fortunately most validation can be done modularly and reused

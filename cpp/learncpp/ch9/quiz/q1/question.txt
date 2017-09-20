@@ -1,0 +1,11 @@
+1) Assuming Point is a class and point is an instance of that class, should you use a normal/friend or member function overload for the following operators?
+
+1a) point + point
+1b) -point
+1c) std::cout << point
+1d) point = 5;
+
+1a) friend
+1b) member
+1c) normal or friend
+1d) member

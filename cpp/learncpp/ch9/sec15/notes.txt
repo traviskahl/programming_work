@@ -1,0 +1,40 @@
+since c++ doesn't know much about our classes default copy constructor and default member assignment operator just use memberwise copying
+this is also called a shallow copy
+c++ copies each member of the class individually
+when classes are simple (not using dynamically allocated memory) this works very well
+
+when they work well there's no reason to write our own versions
+but when designing classes with dynamically allocated memory, shallow copying causes trouble
+shallow copies of a pointer just copy the address, it doesn't allocate any memory or copy the contents
+
+EX: shallow.cpp
+
+we didn't define a copy constructor or assignment operator
+c++ gives us ones that do shallow copies
+when copy is destroyed, so is the data in hello
+because their data is located at the same memory address
+
+doing a shallow copy on pointer values in a copy constructor or assignment operator is VERY BAD
+
+one answer is to do a deep copy of any non-null pointers being copied
+a deep copy allocates memory for the copy then copies the actual data
+so it lives in its own memory address
+therefore the copy and source are distinct and won't affect each other
+doing deep copies requires us to write our own copy constructor and assignment operator
+
+EX: deep.cpp
+
+copy constructor is more involved than a simple shallow copy
+we have to check if the source has a string
+then allocate enough memory to hold it
+finally copy the string over
+
+overloaded assignment operator does mostly the same thing
+except we also have a self-assignment check
+we also return *this for chaining
+and we deallocate anything that was being held so we don't have a memory leak
+
+classes in the standard library that deal with dynamic memory handle their own memory
+they have their own overloaded copy constructors and assignment operators that do deep copying
+we don't need to worry about our own memory management for these
+makes them simpler to use, less error-prone, and we don't spend time writing our own overloaded functions

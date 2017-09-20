@@ -1,0 +1,28 @@
+try and catch blocks work well most of the time
+there's one case where they're not enough
+
+EX: what.cpp
+
+derived class B calls base class constructor A, which can throw exception
+because creation of b is inside a try block in main, it gets handled there
+what if we want to handle it in B?
+call to A's constructor happens via member initialization list
+no way to wrap standard try block around it
+
+we can use a function try block
+designed to have a try block around body of entire function instead of block of code
+
+EX: fcntry.cpp
+
+addition of try keyword before member initializer list
+everything after that until end of function is considered part of the try block
+
+associated catch block is same level of indentation as entire function
+any exception thrown between try and end of function body is eligible to be caught here
+
+unlike normal catch blocks function level catch must throw or rethrow exception
+if we don't explicitly throw a new exception or rethrow using throw; it's delegated up the stack
+
+these are used **almost** exclusively with constructors
+can't use function try to clean up after failure
+function try is useful mostly for logging failures or changing type of exception thrown

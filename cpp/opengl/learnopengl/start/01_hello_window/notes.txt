@@ -1,0 +1,84 @@
+first we include <GLFW/glfw.h>
+in the main function we instantiate the GLFW window
+
+glfwInit() initializes it
+glfwWindowHint() lets us configure certain options
+	its first argument is the option to configure
+	there's many enum'd values
+	second argument is an int that sets the value of the option
+
+we tell it to set opengl version to 3
+we also explicitly tell it to use the core profile
+
+next we'll create a window object
+it holds all the window data and is used by GLFW's other functions
+
+glfwCreateWindow() takes height and width as first two arguments
+third argument gives us a name for the window
+last two parameters don't matter right now
+returns a GLFWwindow object we need later
+
+after this we initialize GLAD
+pass GLAD the function to load address of opengl function pointers
+glfw gives us glfwGetProcAdddress that defines correct function, regardless of OS
+
+before rendering we need to tell opengl the size of the rendering window
+so opengl knows how we want to display data and coordinates
+can set these dimensions via the glViewport function
+
+first two parameters set location of lower left corner of window
+third and fourth set width and height in pixels
+when user resizes a window we should resize viewport as well
+can register a callback function on window that's called when window is resized
+prototype is this:
+	
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+takes a GLFWwindow as its first argument and two ints representing new window dimensions
+when window changes in size glfw calls this and fills in proper arguments
+but we have to tell glfw by registering it
+
+when window is first displayed or changed this function will be called
+many different callback functions we can register our own functions with
+callback functions for to process joystick inputs, process error messages, and more
+	
+***** we register callback functions after creating the window and before the main loop
+
+we don't want the program to draw an image then immediately quit
+want it to continue until program is told to stop
+***** we create a while loop that we call the render loop
+it keeps running until we tell glfw to stop
+
+glfwWindowShouldClose() checks at start of each iteration to see if glfw has been told to close
+if it has, function returns true and loop stops running
+
+glfwPollEvents() checks if any events are triggered
+keyboard inputs, mouse movements, etc.
+it updates the window state and calls corresponding functions
+	we set those with callback functions!
+
+glfwSwapBuffers() swaps the color buffer (a buffer with color values for each pixel in the glfw window)
+shows it as output to the screen
+
+when we exit the render loop we want to clean/delete all resources that were allocated
+we do this with glfwTerminate() that's called at the end of main()
+
+we can also have some input control in glfw through some input functions
+we can use glfwGetKey() that takes window as input together with a key
+here the function returns if the key is currently being pressed
+
+checks if user pressed escape key
+returns GLFW_PRESS if they did
+if not, returns GLFW_RELEASE
+if they pressed it, set glfwWindowShouldClose to true
+this function is called every iteration of the render loop
+lets us check for and react to key presses
+
+we should also place rendering commands inside the render loop
+to test we want to clear the screen with a color we choose
+at the start of each render iteration we always want to clear screen
+otherwise we'd see the results from the previous iteration
+can clear screen's color using glClear()
+we pass in buffer bits to specify which buffer we want to clear
+can pass in GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_STENCIL_BUFFER_BIT
+

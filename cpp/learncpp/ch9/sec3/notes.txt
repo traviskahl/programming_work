@@ -1,0 +1,60 @@
+for classes with multiple member variables printing each individual variable gets boring fast
+
+	std::cout << "Point(" << point.getX() << ", " << 
+		point.getY() << ", " << point.getZ() << ")\n";
+
+it'd make sense to do this as a reusable print() function
+it's better, but it still has some downsides
+print() returns void most of the time so it can't be in the middle of an output statement
+you'd have to split the output across multiple lines
+this can be solved by overloading operator<<
+
+it's similar to overloading operator+, since they're both binary operators
+but the parameter types are different
+consider this expression
+
+	std::cout << point
+
+if operator is <<, what are operands?
+left operand std::cout object of type ostream
+right operand is Point class
+overloaded function should look like:
+
+	friend std::ostream& operator<<(std::ostream& out, const Point& point);
+
+implementation is straightforward
+since c++ knows how to output doubles and members are all doubles
+we just use operator<< to output member variables of our Point
+
+EX: simple.cpp
+
+it's similar to how we'd implement our print() function
+most notable difference is that std::cout became parameter out (which is a reference when it's called)
+only tricky part is return type
+with arithmetic operators we calculate and return a single answer by value
+but if we try to return std::ostream by value we get a compiler error
+std::ostream specifically disallows being copied
+
+so we pass in left hand parameter as a reference
+prevents a copy from being made and lets us chain outputs together like // std::cout << point << std::endl
+
+since operator<< doesn't return a value to the caller, why don't we define it as returning void?
+consider what would happen if it did
+
+	std::cout << point << std::endl;
+
+compiler evaluates this as: // (std::cout << point) << std::endl;
+this then simplifies to // void << std::endl;
+which doesn't make sense
+
+by returning out parameter as the return type, std::cout << point returns std::cout instead
+
+when we want overloaded binary operators to be chainable like this, left operand should be returned by reference
+returning left-hand parameter by ref is okay here: since it was passed in, it'll still exist when function terminates
+we don't need to worry about referencing something that goes out of scope and gets destroyed
+
+can also overload operator>>
+done similarly to output operator
+std::cin is an object of type std::istream
+
+EX: input.cpp

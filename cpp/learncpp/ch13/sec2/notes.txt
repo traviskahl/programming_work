@@ -1,0 +1,77 @@
+c++ doesn't compile the template function directly
+at compile time when the compiler encounters a call to a template function it replicates it
+then replaces template type parameters with actual types
+function with actual types is called a function template instance
+
+first we have the templated function 
+
+	template <typename T>
+	const T& max(const T& x, const T& y) {
+		return (x > y) ? x : y;
+	}
+
+when compiling, compiler encounters a call to the templated function
+
+	int i = max(3, 7);
+
+compiler realizes that we want to call max(int, int)
+replicates the function template and creates the template instance
+
+	const int& max(const int& x, const int& y) {
+		return (x > y) ? x : y;
+	}
+
+now it's a normal function that can be compiled into machine code
+if later it encounters a max() call with different parameters
+
+	double d = max(6.34, 18.532);
+
+it creates a template instance for max(double, double)
+
+compiler knows it only needs to create one template instance per set of unique type parameters
+if we create a template function but don't call it, no instances are created
+
+template functions work with built-in types and classes with one exception
+when it's compiled it compiles like a normal function
+in a normal function any operators or function calls must be defined
+otherwise we get a compiler error
+any operators or function calls in the template function must be defined
+for EVERY type it's instantiated for
+
+EX: cents1.cpp
+
+this might produce a decent compiler error
+there's no overloaded operator> for Cents
+we just define it to solve the problem
+
+another example using template functions
+
+EX: array.cpp
+
+works great for built-in types
+our return type is also the same as our elements in the array
+doing an integer average produces an integer result
+it's not necessarily wrong, but it might be unexpected
+what happens when we try it on our Cents class?
+
+EX: centsarray.cpp
+
+it throws a massive error message
+it can't find a overloaded operator<< for Cents class
+next lines are it trying to find matches and failing
+we just need to define operator<<
+
+EX: centsOL1.cpp
+
+but we get another error or two
+it's because operator+= wasn't defined
+neither was operator/=
+so we should define those as well
+
+EX: centsOL2.cpp
+
+now it works as expected
+it's a lot of work only because the class was so simple to begin with
+we didn't actually have to modify average() at all
+we just defined the operators that it uses in the class that uses the function
+the compiler did the rest

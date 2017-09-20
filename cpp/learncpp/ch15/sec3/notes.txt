@@ -1,0 +1,61 @@
+copy semantics:
+copy constructors are used to initialize classes by making copies
+copy assignment is used to copy one class to another
+C++ automatically provides a copy constructor and copy assignment operator, but they shallow copy
+problematic with dynamically allocated memory, so we override to do deep copies
+
+EX: Auto_ptr3.cpp
+
+more Resource creation and destruction than is really necessary
+1. inside generateResource(), local variable res is created
+2. res is returned by value, so it's copy constructed into a temporary object
+3. res goes out of scope
+4. the temp object is assigned to mainres by copy assignment, allocating another resource
+5. as the expression ends, the temp object is destroyed
+6. at the end of main(), mainres goes out of scope
+can be made more efficient with move semantics
+
+move constructors and move assignment
+C++11 defines 2 new functions for move semantics: move constructors and move assignment operators
+their goal is to move ownership of resources from one object to another
+instead of taking l-value reference parameters, they take non-const r-value reference parameters
+
+EX: Auto_ptr4.cpp
+
+instead of copying resources, we move them
+instead of copying twice in the program, we move twice
+move constructor and move assignment are called when they're defined, and the argument is an r-value
+usually a literal or temp value
+
+when we do assignment where the argument is an l-val, we can only reasonably copy the l-val
+can't assume it's safe to change it, because it might be used later
+in the expression "a = b", we can't expect b to be changed
+
+when we do assignment where the argument is an r-val, we know it's just a temporary object
+instead of copying (expensive), we can copy (cheap) to whatever we're assigning or constructing
+the temp value will be destroyed at the end of the expression anyway, so it's safe to change
+we can overload functions for different behaviors to be smarter and more efficient
+
+automatic l-vals returned by value can be moved instead of copied
+when res is returned by value, it's moved even though it's an l-val
+C++ specification lets them be moved since they're going to be deleted anyway
+
+can disable copy semantics for whatever reason
+ensures that only moving is done
+
+EX: Auto_ptr5.cpp
+
+our auto_ptr class is now a good smart pointer class
+very similar to std::unique_ptr, use that instead
+
+look at a class with dynamic memory allocation
+includes deep-copying copy constructor and copy assignment
+
+EX: DynamicArrayCopy.cpp
+
+use this program to show performance
+allocate 1mil ints on the heap
+this program took 0.0204403 seconds on the author's computer
+
+now replace copying with moving
+took 0.0155596 seconds on the author's computer

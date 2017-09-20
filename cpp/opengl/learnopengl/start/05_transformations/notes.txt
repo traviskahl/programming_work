@@ -1,0 +1,243 @@
+now we can create objects, color them, and give them appearances with textures
+but we can't really move them around the screen
+we could change their vertices and reconfigure buffers each frame
+but that would be a large amount of work and processing power
+a better way to move objects is by using multiple matrix objects
+we also need to understand vectors
+
+at their most basic vectors are directions
+a vector has direction and magnitude (or strength/length)
+think of a treasure map: go west 10 steps, north 3 steps, east 5 steps
+the direction is west, magnitude is 10 steps
+so the directions of the map contains 3 vectors
+
+vectors can have any dimensions, but we usually work with between 2 and 4 dimensions
+if a vector has 2 dimensions it represents a direction in a plane
+three dimensions can represent any direction in a 3d world
+
+since vectors are defined as directions it's hard to see them as points
+we should visualize setting the origin of the direction to (0, 0, 0) and pointing in a direction that specifies the point
+this makes it a position vector
+the position vector (3, 5) points to (3, 5) on the graph with an origin of (0, 0)
+using this we can define vectors as both positions and directions in 2d and 3d space
+
+we can also do operations on vectors
+
+a scalar is a single digit (or a vector with one component)
+when adding/subtracting/multiplying/dividing a vector with a scalar we add/subtract/multiply/divide each element by the scalar
+
+negating a vector results in a vector in the opposite direction
+a vector pointing northeast would point southwest after negation
+to negate a vector we add a minus sign to each element
+can also think of it as scalar multiplication by -1
+
+addition of two vectors is done component-wise
+each component of one vector is added to the corresponding component of the othe vector
+vector subtraction is done the same, but with a negated second vector
+this results in the difference of the positions both vectors point at
+
+to get the magnitude of a vector we use the pythagorean theorem
+in 2d, it's the square root of x^2 + y^2
+a vector forms a triangle when we think of the x and y components as two sides of a triangle
+the third side is the magnitude
+
+there's another type of vector called a unit vector
+it has one extra property, its length is exactly 1
+we can calculate a unit vector from any vector by dividing each component by the length
+this is called normalizing a vector
+
+multiplying two vectors is more difficult
+there's dot multiplication
+
+paper notes: 05_01
+
+lets us calculate the degree between two vectors
+is very handy when doing lighting calculations
+
+there's also cross multiplication
+
+paper notes: 05_02
+
+a matrix is a rectangular array of numbers symbols and/or expressions
+each individual item is called an element
+a 2x3 matrix would be similar to:
+
+	1	2	3
+	4	5	6
+
+matrices are indexed by (i, j) where i is the row and j is the column
+the opposite of what we're used to with 2d graphs
+to get the element 4 we'd need to access element (2, 1)
+
+addition and subtraction between a matrix and a scalar goes like this
+
+	1	2					(1 + 3)	(2 + 3)
+	3	4	+	3	 = 		(3 + 3)	(4 + 3)
+
+scalar is just added to every element in the matrix
+same goes for subtraction
+
+matrix addition between matrices is done per-element
+so it's only doable between matrices of the same size
+
+	1	2	+	5	6	=	1+5	2+6		=	6	8
+	3	4		7	8		3+7	4+8			10	12
+
+same rule applies for subtraction
+
+multiplying a matrix by a scalar multiplies each element by a scalar
+
+	2 x	1	2	=	2x1	2x2	=	2	4
+		3	4		2x3	2x4		6	8
+
+now we understand why they're called scalars
+they just scale all the elements of the matrix
+
+matrix-matrix multiplication should make sense
+you've taken discrete math travis
+i don't want to take these notes again
+i already understand it
+let's get back to vectors
+
+we've already seen some vector usage
+they've represented positions, colors, and texture coordinates
+a vector is really just an Nx1 matrix where N is the number of components
+vectors are a lot like matrices, just with one column
+so if we have an MxN matrix we can multiply it by our Nx1 matrix
+
+by doing this we can transform our vector
+there are many transformations through 2d and 3d space that are done with this
+
+in opengl we usually work with 4x4 matrices for several reasons
+most vectors are of size 4, that's a good reason
+the most simple transformation matrix is the identity matrix
+
+	1	0	0	0
+	0	1	0	0
+	0	0	1	0
+	0	0	0	1
+
+multiplying a vector of size 4 by this matrix just gives us the vector
+it's the starting point for a large amount of transformation matrices
+if we do linear algebra, it also helps us prove stuff and solve equations
+
+when scaling a vector we're increasing its magnitude
+the direction will stay the same
+let's scale the vector (3, 2)
+scale the x-axis by 0.5, make it twice as narrow
+scale the y-axis by 2, make it twice as high
+leave z-axis at 1 to work in 2d space
+
+this would be called a non-uniform scale
+scaling factor isn't the same on all axes
+if it was it'd be called a uniform scale (wow that's unexpected)
+
+we can build a transformation matrix to scale for us
+
+	Sx	0	0	0		x 		Sx*x
+	0	Sy 	0	0		y 		Sy*y
+	0	0	Sz 	0	*	z 	=	Sz*z
+	0	0	0	1		1 		1
+
+note that we can't scale w
+that wouldn't make sense
+
+translation is adding another vector on top of a vector
+essentially moving a vector in a direction
+like a scaling matrix there's a few locations in the matrix that are important
+for translation matrices it's the top 3 elements of the fourth column
+
+	1	0	0	Tx 	* 	x 	=	x+Tx
+	0	1	0	Ty 		y 		y+Ty
+	0	0	1	Tz		z 		z+tZ
+	0	0	0	1		1 		1
+
+this works because translation values are multiplied by the vectors w column
+wouldn't be possible with a 3x3 matrix
+
+w component of a vector is known as a homogenous coordinate
+to get a 3d vector from a homogenous vector we divide x y and z by w
+usually this doesn't affect anything since w will be 1
+using homogenous coords lets us do translations on vectors
+they're also used to create 3d visuals
+
+the previous transformations were fairly easy to understand
+but rotations take a bit more understanding
+what is a rotation of a vector?
+a rotation is represented by an angle
+rotating half a circle would be 180 degrees
+rotating a fifth to the right would be 360/5 = 72 degrees to the right
+
+in 3d rotations have an angle and a rotation axis
+the angle rotates the object along the given axis
+when rotating 2d objects in a 3d world we set the rotation axis to the z-axis
+
+with trig we can transform vectors to new rotated vectors
+done with a combination of sin() and cos()
+
+paper notes: 05_03
+
+using rotation matrices we can transform positional vectors around an axis
+we can also combine them by rotating around one axis, then another
+but we'll get Gimbal lock quickly
+a better solution is to rotate around an arbitrary unit axis
+such as (0.662, 0.2, 0.772), which is a unit vector
+
+the FINAL FORM of matrices is that we can combine them
+we can do multiple transformations with one matrix
+we could have a matrix that lets us scale, then translate
+combine the two through matrix-matrix multiplication
+
+matrix multiplication isn't commutative, A*B != B*A
+the right-most matrix is multiplied by the vector first
+so we should read matrix multiplication from right to left
+do scaling first, then rotations, then transformations
+otherwise we'll get unexpected effects
+
+opengl doesn't have any built-in matrix or vector knowledge
+fortunately we have GLM to do that for us
+stands for openGL Mathematics, a header-only library
+
+most of its functionality that we need can be found in 3 header files
+
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+
+we can define a vector using glm's builtin vector class
+we define a mat4, which is a 4x4 identity matrix by default
+next step is to create a transformation matrix
+do this by passing identity matrix to glm::transform() with a translation vector
+then multiply vector by transformation matrix
+
+we can scale a container object and rotate it as well
+
+	glm::mat4 trans;
+	trans = glm::rotate(trans, radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+first scale the object by 0.5 on each axis
+then rotate it by 90 degrees around the z-axis
+glm expects angles in radians so we convert using glm::radians()
+rectangle is in XY plane so we rotate around z-axis
+
+how do we get the transformation matrix to the shaders?
+glsl has a mat4 type so we'll adapt the shader to accept a mat4 uniform
+multiply position vector by matrix uniform
+
+we still need to pass the matrix though
+
+	unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+first query the location of the uniform and send matrix data to shaders
+first arg is the location
+second arg is how many matrices we're sending through
+third arg asks if we want to transpose our matrix (swap columns and rows)
+most developers use column-major ordering, so does glm, so we set it to GL_FALSE
+last parameter is matrix data but glm stores matrices in a different way than opengl wants them
+so we transform them using glm's value_ptr function
+
+we can also rotate over time and reposition
+we should update the transformation each frame
+and use glfw's time function

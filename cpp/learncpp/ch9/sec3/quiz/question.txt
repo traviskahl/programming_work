@@ -1,0 +1,22 @@
+Take the Fraction class we wrote in the previous quiz (listed below) and add an overloaded operator<< and operator>> to it.
+
+The following program should compile:
+int main()
+{
+ 
+	Fraction f1;
+	std::cout << "Enter fraction 1: ";
+	std::cin >> f1;
+ 
+	Fraction f2;
+	std::cout << "Enter fraction 2: ";
+	std::cin >> f2;
+ 
+	std::cout << f1 << " * " << f2 << " is " << f1 * f2 << '\n';
+ 
+	return 0;
+}
+And produce the result:
+Enter fraction 1: 2/3
+Enter fraction 2: 3/8
+2/3 * 3/8 is 1/4

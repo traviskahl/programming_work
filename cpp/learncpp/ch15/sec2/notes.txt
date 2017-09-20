@@ -1,0 +1,92 @@
+l-values and r-values
+aren't really values, but rather properties of expressions
+every expression has two properties:
+	type: for type checking
+	value category: for some syntax checking, like if something can be assigned to
+in C++03, only l-values and r-values were the value categories
+
+simple to think of l-value as a function or object
+or an expression that evaluates to a function or object
+they have assigned memory addresses
+
+originally defined to be OK on the left side of assignment
+const was added, l-values now can be either modifiable or non-modifiable (which are const)
+
+r-values are everything that aren't l-values (for simplicity's sake, this isn't really true)
+literals like 5
+temporary values like x+1
+anonymous objects like Fraction(2, 5)
+usually evaluated for values, have expression scope, can't be assigned to
+
+C++11 added pr-values, x-values, and gl-values to support move semantics
+we don't need to use these to use move semantics
+
+l-value references
+before C++11, only "references" existed
+in C++11 and later, sometimes called l-value references
+can only be initialized with modifiable l-values
+
+L-value reference 			Can be initialized with			Can modify
+Modifiable l-values			Yes								Yes
+Non-modifiable l-values		No 								No
+R-values 					No 								No
+
+l-value refs to const objects can be initialized with either, but can't be modified
+
+L-value reference to const 			Can be initialized with 			Can modify
+Modifiable l-values					Yes									No
+Non-modifiable l-values 			Yes									No
+R-values 							Yes 								No
+
+l-value refs let us pass any type of argument (l- or r-value) to a function without making a copy
+
+r-value references
+C++11 added references to r-values
+they're references that are only initialized with r-values
+l-value references are made with &
+r-value references are made with &&
+
+int x = 5;
+int &lref = x; // l-value reference initialized with l-value x
+int &&rref = 5; // r-value reference initialized with r-value 5
+
+can't be initialized with l-values
+
+R-value reference 			Can be initialized with 		Can modify
+Modifiable l-values 		No 								No
+Non-modifiable l-values 	No 								No
+R-values 					Yes 							Yes
+
+
+R-value reference to const 		Can be initialized with 	Can modify 
+Modifiable l-values 			No 							No	
+Non-modifiable l-values 		No 							No
+R-values 						Yes 						No
+
+two useful properties
+1. extend lifespan of object they're initialized to the lifespan of r-value reference
+2. non-const r-value references let you modify the r-value
+
+EX: fraction.cpp
+
+Fraction(3, 5) would usually go out of scope at the end of the line (expression duration)
+since we're initializing an r-value ref with it, it's extended to the end of the block
+can use this to print the Fraction's value
+
+EX: intuit.cpp
+
+seems odd to initialize an rref with a literal and then be allowed to change that value
+actually a temporary is created, so the rref is referencing a temporary object, not the actual literal
+rrefs aren't often used in either manner
+
+more often used as function parameters
+useful for function overloads when you want to have different behaviors for l-val and r-val arguments
+
+EX: fun.cpp
+
+when passed an l-val, the function with an l-val reference was selected
+the same is true for r-vals
+important concept for move semantics
+
+almost never return rrefs, for same reason you almost never return lrefs
+most of the time you return a hanging reference

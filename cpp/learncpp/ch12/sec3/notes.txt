@@ -1,0 +1,29 @@
+c++ provides default destructors
+but sometimes we want to provide our own especially if we're doing dynamic memory allocation
+when dealing with inheritance, ALWAYS make destructors virtual
+
+EX: nonvirt.cpp
+
+since base is a Base pointer when it's deleted the program checks if Base destructor is virtual
+it's not so it assumes it only needs to call Base destructor
+but we do want to call Derived destructor which calls Base destructor in turn
+otherwise m_array isn't deleted
+we can make Base destructor virtual
+
+EX: virtualdestruct.cpp
+
+now it properly calls ~Derived()
+Rule: whenever you are dealing with inheritance, you should make any explicit destructors virtual
+
+it's possible to make assignment operator virtual
+but it's not always a good idea and leads to problems
+it's a much more advanced topic
+for simplicity's sake don't make assignment virtual for now
+
+sometimes might want to ignore virtualization
+can use scope resolution operator ::
+
+	Derived derived;
+	derived.Base::getName();
+
+might not use often, but still good to know

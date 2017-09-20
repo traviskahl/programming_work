@@ -1,0 +1,50 @@
+using pointers or references to a base class can simplify code
+but they're only able to call the base version of functions
+
+virtual functions are special types of functions that resolve to the most-derived version
+this capability is part of polymorphism
+a derived function is a match if it has the same signature (name, parameter numbers and type, const-ness) and return type
+these are called overrides
+to make a function virtual, place the "virtual" keyword before function declaration
+
+EX: simple.cpp
+
+since rBase is a reference to Base portion of a Derived object, rBase.getName() would normally be Base::getName()
+but it's virtual, so it looks for a more derived version
+it exists, so it calls that instead
+
+EX: complex.cpp
+
+it also works when there's more than one class between the reference and the object
+
+here's the Animal example using virtual functions
+
+EX: animal.cpp
+
+virtual functions allow this to work
+the array example works as well
+
+	Cat fred("Fred"), misty("Misty"), zeke("Zeke");
+	Dog garbo("Garbo"), pooky("Pooky"), truffle("Truffle");
+
+	Animal *animals[] = { &fred, &garbo, &misty, &pooky, &truffle, &zeke };
+	for (int iii = 0; iii < 6; ++iii)
+		std::cout << animals[iii]->getName() << " says " << animals[iii]->speak() << '\n';
+
+this now works as expected
+even though we only use Cat and Dog, other classes we might add will also work
+one of virtual function's biggest benefits: we can structure code in a way that new classes automatically work
+
+warning: signature of derived class function must exactly match signature of base class function
+if they have different parameter types it'll still compile but not work properly
+
+only base class needs to be marked as virtual
+but having virtual on derived functions doesn't hurt
+it's a good idea but not necessary
+
+don't call virtual functions from constructors or destructors
+when a derived class is created, the base class is created first
+if we call a virtual function from base constructor, derived part hasn't been created yet
+it will call base version even if we wanted to call derived version
+similar issue for destructors
+Rule: never call virtual functions from constructors or destructors

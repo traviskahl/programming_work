@@ -1,0 +1,39 @@
+expression parameters can be used to parameterize template classes
+remember the StaticArray class that we used earlier
+takes two template parameters: type parameter and expression parameter
+let's say we want a function to print the whole array
+we could implement this as a member function
+but here it'll be a non-member function to make other examples easier to follow
+
+EX: staticArray.cpp
+
+it works but it does have a design flaw
+when working with c-style strings it has spaces between all the chars
+with a non-char type it makes sense to have the spaces, not so much with char-based types
+
+we might first think of template specialization
+but all parameters must be explicitly defined
+we make sure print() can be called with a StaticArray<char, 14> but what if it has a different length?
+we'd have to copy functions for each different array size, which isn't possible
+the solution is partial template specialization
+
+partial template specialization lets us specialize classes where some but not all template parameters are explicitly defined
+the solution to our problem is to have a print function where the StaticArray has a type char but length templated
+
+EX: full.cpp
+
+note that as of c++14 partial template specialization only works with classes
+doesn't work with template functions which must be fully specialized
+our example works because it's fully specialized, but uses a class that's partially specialized
+
+the limitation on partial specialization of functions leads to problems when dealing with member functions
+what would have happened if we defined our print() function as a member function?
+
+we could partially specialize the entire class
+it would work but we'd copy a lot of code
+if only we could reuse code from StaticArray<T, size> in StaticArray<double, size>
+we can do this with inheritance
+
+EX: inherit.cpp
+
+now it works without much duplicated code

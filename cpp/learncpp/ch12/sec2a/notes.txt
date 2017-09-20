@@ -1,0 +1,90 @@
+c++11 added two identifiers to address common inheritance problems
+override and final
+they aren't considered keywords, just normal identifiers that have special meanings
+final isn't used much, but override is fantastic and we should use it
+
+a derived class virtual function is only an override if its signature and return type exactly match
+that can lead to accidents like when a function that's intended to be an override actually isn't
+
+EX: nonoverride.cpp
+
+the functions in B aren't overrides because their signatures are different from those in A
+it's easy to see the error in this instance, but as programs get more complex this could be a bigger issue
+to address this issue c++11 added the override specifier
+override can be added to any override function by placing the specifier where const might go
+if the function doesn't override anything the compiler flags it as a error
+
+	class A {
+	public:
+		virtual const char* getName1(int x) { return "A"; }
+		virtual const char* getName2(int x) { return "A"; }
+		virtual const char* getName3(int x) { return "A"; }
+	};
+
+	class B : public A {
+	public:
+		virtual const char* getName1(short int x) override { return "B"; } // compile error: not an override
+		virtual const char* getName2(int x) const override { return "B"; } // comiple error: not an override
+		virtual const char* getName3(int x) override { return "B"; } // okay
+	};
+
+no performance penalty for using override specifier
+but it helps prevent accidental errors
+it's recommended to use it for every virtual function we write
+Rule: Apply the override specifier to every intended override function you write.
+
+might be times we don't want anyone to be able to override a virtual function or inherit from a class
+final specifier can be used to enforce this by compiler
+if someone tries to override a final function or inherit from a final class, compiler gives error
+
+	class A {
+	public:
+		virtual const char* getName() { return "A"; }
+	};
+
+	class B : public A {
+	public:
+		// note use of final specifier: makes function no longer overridable
+		virtual const char* getName() override final { return "B"; }
+	};
+
+	class C : public B {
+	public:
+		virtual const char* getName() override { return "C"; } // compile error
+	};
+
+
+can also mark a class as final
+
+	class A {
+	public:
+		virtual const char* getName() { return "A"; }
+	};
+
+	class B final : public A { // note use of final
+		virtual const char* getName() override { return "B"; }
+	};
+
+	class C : public B { // compile error, can't inherit from final class
+		virtual const char* getName() override { return "C"; }
+	}
+
+one case where derived virtual function can have different return type and still be an override
+if return type of virtual function is a pointer or reference to class, override functions can return 
+	pointer or reference to derived class
+these are covariant return types
+
+	class Base {
+	public:
+		virtual Base* getThis() { return this; }
+	};
+
+	class Derived : public Base {
+	public:
+		virtual Derived* getThis() override { return this; } // still an override
+	};
+
+some older compilers don't support this
+if we call getThis() with a Base (even if it's a pointer or reference to Derived) we'll get a Base*
+c++ can't dynamically select types so we always get type that matches most base version
+only get Derived* if we call getThis() with an object that's already Derived

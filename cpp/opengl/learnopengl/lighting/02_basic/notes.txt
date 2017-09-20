@@ -1,0 +1,118 @@
+in reality lighting is extremely complicated and depends on lots of factors
+we can't afford to calculate it with our limited processing power
+therefore ours in opengl is based on approximations of reality
+these lighting models are close enough but are much easier to process
+composed of 3 components:
+
+	ambient: even when it's dark there's light somewhere
+		objects are never completely dark
+		we use ambient lighting constant that gives objects some color
+	diffuse: directional impact a light has on an object
+		most significant visually
+		the more an object faces the light the higher its light value
+	specular: simulates bright spot of a light, reflection
+		more inclined to color of light than object
+	combine these three and we get the Phong model
+
+light doesn't come from a single source but lots of sources
+one property of light is that it reflects off objects
+this has impact on objects that aren't in the immediate vicinity
+algorithms that do this are called global illumination algorithms
+they're expensive and complex
+
+we'll use a simpler model called ambient lighting
+we just use a small constant color that we add to final result of object's fragments
+take light color, multiply it with a small constant ambient light, multiply with object's color, and boom
+
+diffuse lighting starts to make a difference
+it gives the object more brightness the closer its fragments are aligned to the light rays
+we measure at what angle the light touches a specific fragment
+the closer the angle is to perpendicular the more effect it has
+we use a normal vector: a vector that's perpendicular to the fragment's surface
+then the angle is calculated using the dot product
+the lower the angle, the closer the result is to 0
+we still need to make sure it's normalized though
+
+the dot product returns a scalar that we use to calculate the lights impact
+results in differently lit fragments based on orientation
+to calculate diffuse lighting we need:
+	normal vector: perpendicular to vertex surface
+	directed light ray: direction vector
+		to get this we need light's position vector and fragment's position vector
+
+normal vectors are unit vectors
+since a vertex doesn't have a surface (just a point) we get this by using the surrounding vertices
+we can use the cross product for this, or just add the data by hand
+we need a normal vector for each vertex and use attribute pointers
+
+now have normal vectors but we still need position vectors for light and fragment
+light position vector is just a single variable so we can use a uniform
+for fragment we need world space since that's what we're using everywhere else
+so our fragment position is multiplied by model matrix only
+
+finally we need to do our calculations in the fragment shader
+first is the direction vector between light source and fragment position
+it's the difference between the two vectors
+we also want to normalize them so they end up as unit vectors
+
+next to calculate diffuse effect we take dot product of normal and light direction vector
+that result is multiplied with light's color to get diffuse component
+if the angle is >90 degrees the dot product becomes negative
+so we use the max() function
+lighting for negative colors is just as defined as 1/0 so don't do it
+
+so far we've been passing normal vecftors directly from vertex shader to fragment shader
+but calculations in fragment shader are done in world space, so shouldn't we transform normals to world space too?
+yeah but it isn't that simple
+
+they're only direction vectors and don't represent a point in space
+they also don't have a homogenous coordinate (w)
+translations don't have any effect on them, and they really shouldn't
+
+secondly the model matrix might perform a non-uniform scale
+then the vertices would be changed so that the normal vector isn't a normal anymore
+therefore we should use a different model matrix specifically for normals, called the normal matrix
+normal matrix is "transpose of the inverse of the upper-left corner of the model matrix"
+it's linear algebra
+glsl has inverse and transpose functions so we can do this operation in the vertex shader
+we should cast the matrix to a mat3 to make it lose its translation properties
+and allow it to multiply with the normal vector (which is a vec3)
+for an efficient program don't calculate the normal matrix in the shader
+inversing a matrix is expensive
+
+now we can finish the Phong model by using specular highlights
+it's based on light's direction vector and object's normal vectors
+but it's also based on view direction, what direction the user is looking at
+specular lighting is based on light being reflected
+if the surface is a mirror specular lighting is strongest where we see the light reflected on the surface
+
+calculate a reflection vector by reflecting light direction around normal vector
+calculate angular distance between reflection vector and view direction
+the closer the angle between them, the greater the impact
+so as a result we see a bit of highlight when we're looking at the light's direction reflected
+
+view vector is one extra variable we need for specular lighting
+we calculate this using viewer's world space position and fragment position
+then calculate specular's intensity, multiply this by color of light and add to existing components
+
+we define a specular intensity value to give it a medium-bright color
+then calculate view direction vector and reflect vector along the normal
+then negate the lightDir vector
+reflect() expects first vector to point from light source towards fragment
+but ours is pointing from fragment to light source
+so we negate it, and second argument is the normal vector
+
+next we calculate specular component using a certain formula
+
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	vec3 specular = specularStrength * spec * lightColor;
+
+take dot product between view direction and reflect direction
+also make sure it's not negative
+then raise to power of 32
+the power is the shininess aspect
+if it were higher the object would be shinier
+32 is fine since we don't want it to be too dominant
+
+finally add specular to ambient and diffuse componenents and multiply it by the object's color
+now we have the Phong model

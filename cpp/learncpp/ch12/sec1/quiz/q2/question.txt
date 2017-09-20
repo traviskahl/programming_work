@@ -1,0 +1,9 @@
+2) Why is the above solution non-optimal?
+
+Hint: Think about the future state of Cat and Dog where we want to differentiate Cats and Dogs in more ways.
+Hint: Think about the ways in which having a member that needs to be set at initialization limits you.
+
+The solution is non-optimal because if we want to make Cats and Dogs different in more ways, we have to add more literals.
+The user isn't able to specify what they want to have their Cat or Dog say, at least not in this implementation.
+If we want to add another characteristic to differentiate them, we'll need to make our initializer list
+longer and longer.

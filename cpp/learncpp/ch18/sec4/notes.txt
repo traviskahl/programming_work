@@ -1,0 +1,99 @@
+all io examples so far have been reading/writing to standard input/output
+there's another set of classes called the stream classes for strings
+let us use << and >> to work with strings
+like istring and ostream, provide a buffer to hold data
+unlike them, not connected to an io channel
+one primary use is to buffer output for display later
+or to process input line by line
+
+six stream classes for strings:
+istringstream (derived from istream)
+ostringstream (derived from ostream)
+stringstream (derived from iostream)
+	these are used for normal width strings
+wistringstream
+wostringstream
+wstringstream
+	these are used for wide character width strings
+
+to use these, must #include sstream header
+
+two ways to get data into a stringstream
+1. use insertion operator <<
+//stringstream os;
+// os << "en garde!" << endl;
+2. use the str(string) function to set value of buffer
+//stringstream os;
+//os.str("en garde!");
+
+also two ways to get data out
+1. use str() function
+//stringstream os;
+//os << "12345 67.89" << endl;
+//cout << os.str();
+Output:
+12345 67.89
+2. use extraction operator >>
+//stringstream os;
+// os << "12345 67.89" << endl;
+//string strValue;
+//os >> strValue;
+//string strValue2;
+//os >> strValue2;
+//cout << strValue << " - " << strValue2 << endl;
+Output:
+12345 - 67.89
+
+>> iterates through the string
+each use returns next extractable value in the stream
+str() returns the entire value of the stream, even if >> has been used
+
+insertion and extraction operators know how to work with all basic data types
+we can use them to convert strings to numbers or vice versa
+
+converting from number to string
+//stringstream os;
+//int nValue = 12345;
+//double dValue = 67.89;
+//os << nValue << " " << dValue;
+//string strValue1, strValue2;
+//os >> strValue1 >> strValue2;
+//cout << strValue1 << " " << strValue2 << endl;
+Output:
+12345 67.89
+
+converting from string to number
+//stringstream os;
+//os << "12345 67.89";
+//int nValue;
+//double dValue;
+//os >> nValue >> dValue;
+//cout << nValue << " " << dValue << endl;
+Output:
+12345 67.89
+
+several ways to empty a stringstream's buffer
+1. set it to empty using str() and a blank c-style string
+//stringstream os;
+//os << "Hello";
+//os.str("");
+//os << "World!";
+//cout << os.str();
+
+2. set it to empty using str() and a blank std::string
+//stringstream os;
+//os << "Hello";
+//os.str(std::string());
+//os << "World!";
+//cout << os.str();
+
+both will output:
+World!
+
+when clearing a stringstream, also good to call clear() to reset error flags
+//stringstream os;
+//os << "Hello ";
+//os.str("");
+//os.clear();
+//os << "World!";
+//cout << os.str();

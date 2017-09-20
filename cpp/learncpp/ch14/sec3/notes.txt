@@ -1,0 +1,45 @@
+in previous examples, throw statements were directly in a try block
+if this were necessary, exceptions would have limited use
+one of their most useful properties is that they don't have to be directly in a try block
+they'll just be sent further up the stack
+let's us use exceptions in a more modular fashion
+
+EX: sqrt.cpp
+
+what happens when exception is raised
+first, program looks if it can be handled immediately
+if not, current function terminates and sees if function's caller can handle it
+if not, goes to caller's caller
+each function terminates in sequence until it's handled or main() is terminated
+this is called unwinding the stack
+
+mySqrt() threw an exception that couldn't be handled immediately
+so it was sent to main()
+it delegates responsibility to it's caller by not having a try block
+
+why not just make the function handle its own exception?
+different programs might want to handle the exception in different ways
+CLI program might want to print an error
+GUI program might want to pop up a window
+one program might consider it fatal, another might not
+by passing it up the stack, it becomes as modular as we can make it
+
+another example showing stack unwinding in practice
+
+EX: unwind.cpp
+
+last() doesn't handle exception, sent to third()
+third() doesn't handle it, sends it to second()
+second() has a try block, tries to handle exception
+doesn't handle exception of type int, sends it to first()
+first() handles exception, resumes in first()
+main() doesn't have any exceptions to handle
+
+this shows some useful principles
+first: an immediate caller doesn't have to handle an exception
+	it can delegate it arbitrarily
+second: if a try block doesn't have a proper catch block, nothing happens
+	stack unwinding just resumes as usual
+third: once an exception is handled control flow resumes from after the catch block
+
+stack unwinding gives us some useful behavior

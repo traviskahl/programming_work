@@ -1,0 +1,49 @@
+here's a class demonstrating the diamond problem
+
+EX: problem.cpp
+
+we can see that PoweredDevice was constructed twice
+sometimes this is what we want, sometimes it isn't
+
+to share a base class insert the virtual keyword in the inheritance list of the derived class
+this creates a virtual base class
+there's only one object shared
+
+	class PoweredDevice {};
+	class Scanner : virtual public PoweredDevice {};
+	class Printer : virtual public PoweredDevice {};
+	class Copier : public Scanner, public Printer {};
+
+when we create a Copier there's only one copy of PoweredDevice
+but there's another problem
+if Scanner and Printer share a base class, who's responsible for creating it?
+it's Copier
+this is the one time it's allowed to call a non-immediate parent's constructor directly
+
+EX: vbase.cpp
+
+now PoweredDevice only gets constructed once
+
+there's a few details to note
+
+virtual base classes are always constructed first
+this ensures all bases are created
+
+the Scanner and Printer constructors still have calls to PoweredDevice constructor
+when creating a Copier these constructor calls are just ignored
+because Copier is responsible for making those calls
+but if we're creating an instance of Scanner or Printer the calls would be used
+
+if a class inherits one or more classes with virtual parents, the most derived class is responsible
+	for constructing the virtual base class
+in this case it's Copier since both its parents virtually inherit PoweredDevice
+if Copier was inherited from Printer only and Printer was virtually inherited from PoweredDevice
+	Copier would still be responsible
+
+a virtual base class is always considered a direct base of its most derived class
+that's why it's responsible for its construction
+classes inheriting the virtual base still need access to it
+compiler creates a virtual table for each class directly inheriting the virtual class
+in this case it's Printer and Scanner
+the vtables point to functions in the most derived class
+since the derived classes have a virtual table they're larger by the size of one pointer

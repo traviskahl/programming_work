@@ -1,0 +1,26 @@
+some templated container classes have issues when template parameters are pointers
+the constructor does a shallow copy but we need it to do a deep copy
+
+full template specialization forces us to fully resolve templated types
+to fix our issue we'd need to define a new constructor for every pointer type
+but we're duplicating code
+partial template specialization gives us a solution
+we can define a version of our Storage class that works for pointer values
+it's considered partially specialized because we're telling the compiler it's only for use with pointer types
+but we still haven't defined the underlying type exactly
+
+EX: point.cpp
+
+when myintptr is defined with an int* template parameter compiler sees that we defined a partially specialized class
+that works with any pointer type and instantiates a version of Storage using that template
+constructor of the class makes a deep copy of parameter x
+when we change x to 9 the value in Storage isn't affected because it's its own location
+
+without the partial specialization it would have been changed
+because no deep copy would have taken place
+
+since this partially specialized class only allocates one value, for c-style strings, only the first character is copied
+if we want to copy entire strings we can fully specialize the constructor and destructor for type char*
+the fully spec'd class takes precedence over partially spec'd version
+
+EX: precede.cpp

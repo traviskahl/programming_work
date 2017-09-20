@@ -1,0 +1,53 @@
+in reality every object reflects light differently
+steel is shinier than clay, wood doesn't react to light the same as steel will
+every object responds differently to specular highlights
+some reflect without scattering results, others scatter a lot
+results in larger or smaller highlights
+to simulate this in opengl we must define a material property
+
+when describing objects we can define a material color for each lighting component
+by specifying a color for each component we have more control over color output
+add in a shininess component we have all we need
+
+	#version 330 core
+	struct Material {
+		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+		float shininess;
+	};
+	uniform Material material;
+
+in fragment shader we declare a struct to store material properties
+we could store them as individual uniforms, but a struct is more organized
+
+we define a color vector for each lighting component
+now we can simulate a lot of real-world materials
+getting the right materials for an object is difficult
+takes experimentation and experience
+
+we created a uniform material struct in frag shader so let's change lighting calculations to use it
+we can access them from material uniform
+now we can access all properties when we need them
+we set the material in our program using uniform sets
+in glsl structs aren't special in any regard
+it's just encapsulation, so we can do something like this
+
+	lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+
+running as is makes it looks not quite right
+the light is far too bright
+component colors are reflected with full force from any light source
+light sources also have different intensities for each component, similar to materials
+right now it's just a vec3 with each component set to 1.0
+
+we can declare a Light struct with similar characteristics
+ambient light is usually set low so it isn't overpowering
+diffuse is usually set to the exact color we want the light to have
+it's often a white color
+specular is usually at 1.0 for all values
+it should also have a position vector
+
+since we have easy access to light properties we can make interesting effects
+we can change light color over time
+

@@ -1,0 +1,70 @@
+STLs most common functionality is using containers
+has many different containers to be used in different situations
+three basic categories of containers:
+	sequence containers
+	associative containers
+	container adapters
+
+sequence containers maintain the ordering of elements in the container
+you can choose where to place the element by position
+like arrays
+CPP11 has six sequence containers
+	std::vector
+	std::deque
+	std::array
+	std::list
+	std::forward_list
+	std::basic_string
+
+vector in this context isn't a force with speed and direction
+it's a dynamic array that can grow as needed
+has an overloaded operator[] to access elements
+inserting and removing is generally fast
+
+EX: vector.cpp
+
+deque (deck) is a double ended queue
+it's really a dynamic array that can grow on both ends
+
+EX: deque.cpp
+
+a list (in the STL) is a type of sequence container called a doubly linked list
+each element points to the next and previous elements in the list
+no random access, must walk through the list until you get the element you want
+the advantage is that inserting is very fast if you know where to place it
+iterators are used to walk through
+
+associative containers automatically sort inputs
+use operator< by default (sort smallest to largest)
+
+a set stores unique elements and disallows duplicates
+elements are sorted according to values
+
+multisets are the same, but allows duplicates
+
+a map (or associative array) is a set where elements are key/value pairs
+the key is used for sorting and indexing and must be unique
+the value is the data
+
+a multimap (or dictionary) is a map with duplicate keys
+like a real dictionary: the key is the word, the value is the definition
+sorted ascending, can look up value by key
+some words have multiple meanings
+
+container adapters
+special predefined containers for specific needs
+you can choose which sequence container you want them to use
+
+stack is a last in, first out data structure
+push() places at end
+pop() removes from end
+default to using deque, but can use list or vector
+
+queue is a first in, first out data structure
+push() places at end
+pop() removes from front
+default to deque but can use list
+
+priority queue is a derivative of queue that automatically sorts elements using operator<
+push() sorts the element into the queue
+pop() removes from the front, which is the highest priority item

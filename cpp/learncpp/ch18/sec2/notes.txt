@@ -1,0 +1,79 @@
+iostream library is complex, can't cover it all
+here are some of the most common functionalities
+
+we can use >> to extract information from an input stream
+when reading strings sometimes the input overflows the buffer
+//char buf[10];
+//cin >> buf;
+
+what happens when the user enters 18 characters?
+buffer overflows, nightmare land
+bad idea to make assumptions about how many characters will be entered
+
+can handle this problem using manipulators
+manipulator: object that is used to modify a stream when applied with >> or <<
+already used endl which prints newline and flushes any buffered output
+can also use setw() in iomanip.h that limits the number of characters read in
+//#include <iomanip.h>
+//char buf[10]
+//cin >> setw(10) >> buf;
+now it only reads the first 9 characters into buf
+leaves room for a terminator
+any remaining chars are left in the stream until the next extraction
+
+extraction operator works with "formatted" data
+skips whitespace (blanks, tabs, newlines)
+
+EX: skipwhites.cpp
+
+it skips spaces and newlines
+usually we want these
+istream provides many ways to do this
+one is the get() function
+just gets a character from an istream
+
+EX: noskipwhites.cpp
+
+output now works as expected
+
+also has a version that takes a max number of characters to read
+
+EX: getnum.cpp
+
+only took the first 10 chars, even though we specified 11
+needed to leave room for a terminator
+the remaining were left in the input stream
+
+get() doesn't read in a newline
+can cause unexpected results
+
+EX: newlines.cpp
+
+when the input is "Hello!" it doesn't ask for more characters
+first get() read up to newline then stopped
+second get() saw there was still input in the cin stream
+first character was a newline, so it stopped immediately
+
+another function called getline() that works like get(), but reads newlines
+
+EX: getlines.cpp
+
+now it performs as expected
+
+use gcount() to know how many characters were extracted by the last call of getline()
+
+EX: gcounting.cpp
+
+special version of getline() lives outside of istream class
+it's used for reading variables of type string
+not a member of ostream or istream
+included in string header
+
+EX: stringget.cpp
+
+other useful input functions exist
+ignore() discards first character in the stream
+ignore(nCount) discard first nCount chars
+peek() lets us read a character without removing it
+unget() returns the last char read to the stream
+putback(char ch) allows us to put back a char of our choice back in the stream 

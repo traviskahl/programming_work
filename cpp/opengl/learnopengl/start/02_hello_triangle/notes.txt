@@ -1,0 +1,419 @@
+in opengl everything is in 3d space, but our screen is in 2d
+so a large part of it is translating 3d coordinates into 2d pixels we can interpret
+this process is handled by the graphics pipeline
+
+can divide it into 2 main parts
+first part transforms 3d coordinates into 2d coordinates
+second part transforms 2d coordinates into pixels
+
+graphics pipeline takes a set of 3d coordinates as input
+transforms these into pixels
+it's divided into several steps where each step requires the output of the previous
+they're highly specialized and can be executed in parallel
+because of this gpu's have many small processing cores to process data
+they run small programs on the gpu for each step of the pipeline
+these programs are called shaders
+
+some shaders are configurable by the developer
+lets us write our own shaders to replace existing shaders
+gives us more control over specific parts of the pipeline
+and since they're on the gpu, saves resources on the gpu
+shaders are written in opengl shading language (glsl)
+
+let's say we want to create a triangle
+as input to graphics pipeline we pass a list of 3 3d coordinates that will form our triangle
+it's just a collection of vertices
+vertex: a collection of data for a 3d coordinate
+represented using vertex attributes that can have any data we want
+for this let's assume each vertex is just a 3d position and a color value
+
+in order for opengl to interpret our data we have to give it render types
+do we want a collection of points? triangles? a single line?
+these hints are called primitives and are given to opengl while calling drawing commands
+some hints: GL_POINTS, GL_TRIANGLES, GL_LINE_STRIP
+
+first part of pipeline is vertex shader that takes a single vertex
+main purpose is to transform 3d coordinates into different 3d coords
+vertex shader lets us do some processing on vertex attributes
+
+primitive assembly stage takes all vertices from vertex shader as input
+it forms a primitive and assembles the points into a primitive shape
+in this case it's a triangle
+
+output of primitive assembly is passed to geometry shader
+takes input as a collection of vertices that form a primitive
+has the ability to generate other shapes by creating new vertices
+this forms new primitives
+in this case it creates a new triangle out of the given shape
+
+output of geometry shader is passed into the rasterization stage
+maps the primitives into the corresponding pixels on the screen
+results in fragments for the fragment shader to use
+before fragment shader runs, clipping is done
+discards all fragments outside our view, increases performance
+one fragment is all the data required for opengl to render a single pixel
+
+main purpose of fragment shader is to calculate final color of pixel
+usually the stage where opengl effects occur
+fragment shader contains data about the 3d scene
+it uses this to calculate the final pixel color (lights, shadows, color of light, etc)
+
+object is passed to the alpha test and blending stage
+checks corresponding depth and stencil value of fragment
+uses those to see if it's in front of or behind other objects and should be discarded
+also checks for alpha values (opacity) and blends object accordingly
+if a pixel color is calculated in fragment shader, final pixel color could be totally different
+
+graphics pipeline is complex - and configurable
+but for most cases we only need to work with the vertex and fragment shader
+geometry shader is optional and usually left to the default
+
+in modern opengl we're required to define at least a vertex and fragment shader of our own
+no default vertex/fragment shaders on gpu
+it might be difficult to learn because of this
+takes a decent amount of knowledge before rendering the first triangle
+once we finally get to do this, we know much more about graphics
+
+to draw something we have to give opengl some input graphics data
+it's a 3d library so all coordinates are in 3d
+doesn't transform all 3d coordinates, only ones that will show up on the screen
+only processes them when they're between -1.0 and 1.0 on all axes
+all coords in this range are called normalized device coordinates
+they end up visible
+
+we want to render a single triangle so we specify three vertices
+each vertex has a 3d position
+define them in normalized device coords in a float array
+
+opengl works in 3d space so we render a 2d triangle
+each vertex has a z coord of 0.0
+depth of triangle remains the same making it look like its 2d
+
+with vertex data defined we send it as input to first process of graphics pipeline
+remember: it's the vertex shader
+done by creating memory on gpu where we store vertex data
+then configure how opengl should interpret the memory
+and how to send data to the graphics card
+processes as much as we tell it to
+
+we can manage this memory using vertex buffer objects (VBO's)
+they store many vertices in the gpu's memory
+the advantage of using these is we can send large batches of data all at once
+we don't have to send one vertex at a time
+sending data to the graphics card from the cpu is relatively slow
+so whenever we can optimize we should send as much as possible at once
+once the data is in the gpu's memory vertex shader has near instant access
+
+vertex buffer object is our first opengl object
+like any object in opengl it has a unique id corresponding to that buffer
+we can generate one using glGenBuffers()
+
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+
+opengl has many types of buffer objects
+buffer type of vertex buffer object is GL_ARRAY_BUFFER
+opengl lets us bind to several buffers at once
+as long as they have a different buffer type
+can bind this new buffer to GL_ARRAY_BUFFER with glBindBuffer()
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+now when we make a buffer call on GL_ARRAY_BUFFER we'll configure the currently bound buffer
+in this case it's VBO
+we can make a call to glBufferData to copy the vertex data into buffer memory
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+it's a function to copy user data into the currently bound buffer
+first argument is the type of buffer we want to copy data into
+here it's the vertex buffer object bound to the GL_ARRAY_BUFFER target
+second argument defines size of data in bytes we want to pass to buffer
+can use sizeof() on vertex data
+third parameter is data we send in
+fourth parameter is how we want graphics card to manage the data
+three different forms:
+
+	GL_STATIC_DRAW: data most likely won't change at all, or very rarely
+	GL_DYNAMIC_DRAW: data is likely to change a lot
+	GL_STREAM_DRAW: data will change every time it's drawn
+
+position of triangle won't change, stays the same for every render call
+usage type should be GL_STATIC_DRAW
+if we have a buffer with data that'll change often, dynamic or stream draw
+	ensures gpu places data into memory that allows faster writes
+
+vertex shader is one shader that's programmable by normal people
+modern opengl requires us to set up a vertex and fragment shader
+we'll talk about shaders and configure two for drawing the triangle
+
+first thing we need is write the vertex shader in glsl
+then compile the shader so we can use it in application
+
+EX: bvertex.glsl
+
+glsl looks similar to c
+shader begins with declaration of version
+since opengl 3.3 and higher version numbers of glsl and opengl match
+explicitly declare we're using core profile
+
+declare input vertex attributes in vertex shader with the in keyword
+right now we only care about position data so we only need one vertex attribute
+glsl has vector datatype with 1 to 4 float based on postfix digit
+each vertex has 3d coord so we create vec3 input variable with name aPos
+set the location of input variable with layout (location = 0)
+we'll need it later
+
+to set output of vertex shader we assign the position data to gl_Position
+it's really a vec4
+at the end of main() whatever gl_Position was set to is used as the output of vertex shader
+since input is a vector of size 3 we have to cast it to a size 4 vector
+we insert vec3 values into the constructor of vec4 and set w to 1.0f
+
+extremely simple, no actual processing
+just forwarded it to shader's output
+in real applications input data isn't in normalized device coords
+so we transform input into coords that are visible
+
+we wrote code for vertex shader but for opengl to use it it must be compiled
+compilation is done at runtime from the source code
+
+first thing we do is create a shader object, referenced by ID
+we store vertex shader as a GLuint and create shader with glCreateShader()
+
+	unsigned int vertexShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+provide type of shader we want as an argument
+since it's a vertex shader we pass GL_VERTEX_SHADER
+
+then we attach shader source code to shader object and compile it
+
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+
+glShaderSource() takes shader object to compile as first arg
+second arg specifies how many strings we're passing
+third arg is source code
+fourth arg can be left NULL
+
+most likely want to check if compilation succeeded after the call
+checking for compile-errors can be done like this:
+
+	int success;
+	char infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+first define int to indicate success and container for any error messages
+check compilation with glGetShaderiv()
+if compilation failed we should get message with glGetShaderInfoLog() and print error message
+
+	if (!success) {
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << '\n';
+	}
+
+if no errors, shader is compiled
+
+fragment shader is second and final shader we'll create for our triangle
+fragment shader is about calculating color output of our pixels
+to keep it simple fragment shader will output an orange-ish color
+
+colors in computer graphics are usually in an array of 4 values
+red, green, blue, and alpha (opacity): RGBA
+when defining a color in opengl the strength is between 1.0 and 0.0
+
+EX: bfragment.glsl
+
+fragment shader only needs one output variable
+it's a size 4 vector that determines final color output we calculate ourselves
+we can declare output values with out keyword
+then we assign a vec4 to color output as an orange color with an alpha of 1.0
+
+process for compiling fragment shader is similar to vertex shader
+but now we use GL_FRAGMENT_SHADER for the shader type
+
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+
+both shaders should be compiled and we just have to link them into a shader program
+we use that for rendering
+
+shader program object is final linked version of multiple shaders
+to use compiled shaders we must link them into a program
+then activate it when rendering objects
+activated shader program's shaders are used when we issue render calls
+
+when linking shaders it links the outputs of each shader to inputs of next shader
+it's also where we'll get linking errors if inputs and outputs don't match
+
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+
+glCreateProgram() creates a program and returns ID reference to program object
+now we attach shaders to program object and link them with glLinkProgram()
+
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+
+result is an object that we activate using glUseProgram()
+	
+	glUseProgram(shaderProgram);
+
+every shader and rendering call after this call uses program object and the shaders
+also delete shaders after they've been linked
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+we sent input vertex data to gpu and told gpu how it should process the data
+we're very close, but opengl doesn't know how it should interpret the vertex data
+or how it should connect the data to the attributes
+we need to tell opengl
+
+vertex shader lets us specify any input we want in the form of vertex attributes
+it's great, but we must manually specify what part of out input goes to which attrib in the shader
+vertex buffer data is formatted like this:
+	position data is a 4-byte floating point value
+	each position has 3 of these value
+	no space between each set of 3 values
+	first value in data is at the beginning of the buffer
+
+now we can tell opengl how it should interpret the vertex data
+use glVertexAttribPointer()
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+this function has a few parameters:
+	1. specify which vertex attrib we want to configure
+		in the shader, we specified the location of the position vertex with layout (location = 0);
+		sets the location of the vertex to 0 and we want to pass data to this
+		so we pass in 0
+	2. specifies size of vertex attribute
+		it's a vec3, so it has 3 values
+	3. specifies the type of the data, which is a GL_FLOAT
+		a vec* in glsl has floating point values
+	4. specifies if we want data to be normalized
+		if it's true, all data not between 0 and 1 is set to those values
+		we leave it at false
+	5. known as the stride, the space between consecutive vertex attribute sets
+		next set of data is 3 floats away, that's the stride
+		since we know the data is tightly packed, could've had 0
+		this would let opengl determine the stride
+		with more vertex attribs we need to carefully define the spacing
+	6. type is void* and is the offset of where data begins in the buffer
+		data is at start of array so it's just 0
+
+we should also enable the vertex attribute with glEnableVertexAttribArray()
+give the vertex attribute as its argument, vertex attribs are disabled by default
+after that everything's set up
+but drawing the object would be rather complex at this point
+
+we'd need to repeat the process every time we'd draw an object
+but there's a way to store state configurations into an object and bind it to restore the state
+
+vertex array objects (VAOs) can be bound, like a VBO
+any vertex attrib calls after that are stored in the VAO
+when configuring vertex attrib pointers we only make the call once
+when we want to draw an object, we just bind the corresponding VAO
+makes switching between different vertex data and attribute configs easy
+
+core opengl requires the use of a VAO
+otherwise it'll probably refuse to draw anything
+
+VAO stores these:
+	calls to glEnableVertexAttribArray() or glDisableAttribArray()
+	vertex attrib configs via glVertexAttribPointer
+	VBOs associated with vertex attribs by calls to glVertexAttribPointer()
+
+process to generate a VAO is similar to a VBO
+	
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+
+to use one just bind the VAO using glBindVertexArray()
+after that we should bind the VBOs and attrib pointers
+then unbind the VAO for later use
+when we want to draw something, we just bind the VAO with preferred settings
+
+when we have multiple objects we want to draw we first generate all VAOs
+then store required VBOs and attrib pointers
+when we want to draw one, take the corresponding VAO, bind it, draw object, unbind VAO again
+
+to draw object opengl gives us glDrawArrays() that draws primitives
+
+	glUseProgram(shaderProgam);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+glDrawArrays() takes the primitive we want
+second arg specifies starting index of vertex array
+last arg specifies how many vertices we want
+
+something else that's relevant to rendering vertices is element buffer objects (EBOs)
+suppose we want to draw a rectangle instead of a triangle
+we can draw a rectangle using two triangles since opengl mainly works with triangles
+example vertices[]:
+
+	float vertices[] {
+		// first triangle
+		 0.5f,  0.5f,  0.0f, // top right
+		 0.5f, -0.5f,  0.0f, // bottom right
+		-0.5f,  0.5f,  0.0f, // top left
+		// second triangle
+		 0.5f, -0.5f,  0.0f, // bottom right
+		-0.5f, -0.5f,  0.0f, // bottom left
+		-0.5f,  0.5f,  0.0f, // top left
+	};
+
+there's some overlap on vertices specified
+we have bottom right and top left twice
+that's an overhead of 50% since the same rectangle could also be specified with 4 vertices, not 6
+get worse when we have more complex models
+a better solution is to have only unique vertices and specify order we want them to be drawn
+
+opengl has this functionality as EBOs
+it's a buffer that stores indices that opengl uses to decide what vertices to draw
+this indexed drawing is our solution
+we have to specify the unique vertices and the indices to draw them as a rectangle
+
+	float vertices[] = {
+		 0.5f,  0.5f, 0.0f, // top right
+		 0.5f, -0.5f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f, // bottom left
+		 0.5f,  0.5f, 0.0f  // top left
+	};
+	unsigned int indices[] = { // note that we start from 0!
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+	};
+
+when using indices we only need 4 vertices instead of 6
+next we create the element buffer object
+
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+
+like the VBO we bind the EBO and copy the indices into the buffer with glBufferData
+also we want to place them between a bind and unbind
+but we specify GL_ELEMENT_ARRAY_BUFFER as the buffer type
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+finally replace glDrawArrays with glDrawElements()
+to indicate we want to render triangles from index buffer
+when using glDrawElements() we draw using indices in EBO currently bound
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+first arg specifies mode we want to draw in
+second arg is the number of elements we want to draw
+third arg is the type of the indices, which is an unsigned int
+last argument specifies an offset in the EBO but we leave it at 0
+

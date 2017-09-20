@@ -1,0 +1,95 @@
+so far all virtual functions have had a body (or definition)
+but c++ allows us to create a special type of virtual function called a pure virtual function (or abstract function)
+it has no body at all
+they act as placeholders that are meant to be overridden
+to create one, instead of defining a body, we assign the function the value 0
+
+	class Base {
+	public:
+		const char* sayHi() { return "Hi"; } // a normal non-virtual function
+
+		virtual const char* getName() { return "Base"; } // a normal virtual function
+
+		virtual int getValue() = 0; // a pure virtual function
+
+		int doSomething() = 0; // Compile error: can not set non-virtual functions to 0
+	}
+
+when we add a pure virtual function to a class, we leave it up to derived classes to define it
+
+using them has two main consequences
+any class with one or more becomes an abstract base class
+it then cannot be instantiated
+if we could, what would happen if we tried to call a pure virtual function?
+also, any derived class must define the function or be considered abstract as well
+
+example of pure virtual function using Animal example:
+
+EX: orig_animal.cpp
+
+by making Animal constructor protected we prevent people from creating objects of type Animal
+there's still two problems:
+	constructor is still accessible by derived classes, so they can create Animal objects
+	it's still possible for derived classes to not override speak() function
+
+because we didn't redefine speak() in Cow, it calls Animal::speak()
+but that shouldn't be able to happen
+we can use a pure virtual function
+
+EX: abs_animal.cpp
+
+now we can only instantiate Cow if it provides a body for speak()
+
+pure virtual functions are useful when we have functions we need in a base class
+but only derived classes know what it should return
+it ensures derived classes don't forget to redefine functions they need to
+
+we can actually define pure virtual functions to have bodies
+body must be provided separately, not inline
+useful if we want base class to have default implementation but force derived classes to provide their own
+if they're okay with default implementation they can just use that
+
+EX: bodied.cpp
+
+this exists but isn't used often
+
+interface classes have no member variables and all functions are pure virtual
+class is just a definition and has no implementation
+useful when we want to define functionality that derived classes must implement, but leave the details to them
+often named beginning with I
+
+	class IErrorLog {
+	public:
+		virtual bool openLog(const char* filename) = 0;
+		virtual bool closeLog() = 0;
+
+		virtual bool writeError(const char* errorMessage) = 0;
+
+		virtual ~IErrorLog() {} // make a virtual destructor in case we delete an IErrorLog pointer so the proper derived destructor is called
+	};
+
+anything inheriting IErrorLog must provide implementations for these functions
+could derive a class named FileErrorLog
+	openLog() opens a file on disc
+	closeLog() closes said file
+	writeError() writes the message to the file
+could derive another called ScreenErrorLog
+	openLog() and closeLog() do nothing
+	writeError() prints the message in a pop-up message box on the screen
+
+if we write code that uses an error log, the user can use any type they want
+if they want it to go to a file, they can choose that
+otherwise they can add a different kind of functionality
+it makes the program more independent and flexible
+
+don't forget virtual destructor for interface class so proper destructor is called
+
+interface classes have become very popular due to ease of use, easy to extend, and easy to maintain
+some languages like Java and C# added interface keyword to let people define interfaces
+these languages don't allow multiple inheritance, but they do allow as many interfaces as you want
+they have no data and no function bodies, so they avoid typical multiple inheritance problems
+
+abstract classes still have virtual tables
+they can still be used if you have a pointer or reference to the abstract class
+virtual table entry for a pure virtual function generally has a null pointer
+or a pointer to a generic function that prints an error if there's no override

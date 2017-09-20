@@ -1,0 +1,91 @@
+in the past we would set references and pointers to derived objects
+
+	Base &ref = derived;
+	Base *ptr = derived;
+
+what happens if we just assign a derived object to a base object?
+
+EX: assigning.cpp
+
+remember: Derived has a Base part and a Derived part
+when we copy it over, only the base part is copied
+base receives a copy of Base part, not Derived part
+it's been "sliced"
+
+slicing causes unexpected results when you aren't expecting it
+
+above example is very simple, probably wouldn't assign derived to base like this
+slicing is much more likely to occur with functions
+
+	void printName(const Base base) { // it's passed by value, not reference
+		std::cout << "I am a " << base.getName() << '\n';
+	}
+
+simple function with a const base object parameter passed by value
+called like this:
+	
+	derived d(5);
+	printName(d);
+
+object gets sliced because passed object is a Derived
+when it's passed into the function, it creates a new Base object
+tries to copy the Derived object, but only copies Base part
+outputs: I am a Base
+
+in this case it's obvious
+but if functions don't print identifying information it can be hard to track down
+can be easily avoided in this instance by passing classes by reference
+
+	void printName(const Base &base)
+
+another place where slicing occurs is with vectors
+
+EX: vslice.cpp
+
+since the vector was declared as a vector of type Base the Derived object is sliced
+most new programmers try to create a vector of references
+
+	std::vector<Base&> v;
+
+but it doesn't compile
+elements of a vector must be assignable
+references can't be reassigned, only initialized
+
+one way to fix this is with a vector of pointers
+but now we have to think about dynamic memory allocation
+that's a bit of more work
+
+there's another solution
+standard library gives us a workaround: std::reference_wrapper class
+it's a class that acts like a reference but allows assignment and copying
+so it's compatible with std::vector
+
+don't need to know how it's implemented
+only need to know:
+	lives in the <functional> header
+	when we create one, it can't be an anonymous object
+	when we want to get the object, use the get() function
+
+EX: refwrap.cpp
+
+works and also avoids memory allocation
+might seem a bit obscure because of nested types
+makes more sense when you understand templates
+
+in other examples we saw cases where the derived class had been sliced off
+let's look at another case where the derived object still exists
+
+	Derived d1(5);
+	Derived d2(6);
+	Base &b = d2;
+
+	b = d1; // this line is problematic
+
+since b points at d2 and we assign d1 to b we might think the result is d1 being copied into d2
+it would if b were a Derived
+but b is a Base and operator= that c++ gives us isn't virtual by default
+so only Base part is copied into d2
+d2 has the base portion of d1 and Derived portion of d2
+in this example it's not a problem because Derived doesn't have its own data
+but in other cases it's a Frankenobject - composed of parts of different objects
+there's no easy way to prevent this from happening other than avoiding assignments like this when possible

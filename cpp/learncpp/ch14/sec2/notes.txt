@@ -1,0 +1,73 @@
+exceptions are implemented using the throw, try, and catch keywords
+in real life, we use signals to note when events happen
+if a football player commits a foul, the ref throws a flag
+a penalty is assessed and executed
+once the penalty is dealt with, play resumes as usual
+
+in c++, throw is used to signal that an exception or error occurred
+also commonly called raising an exception
+to use a throw statement, use throw keyword followed by a value of any data type
+typically an error code, description of problem, or custom exception class
+
+examples:
+throw -1; //throw literal int value
+throw ENUM_INVALID_INDEX; // throw enum value
+throw "Can not take square root of negative number"; // throw a literal c-style string
+throw dX; // throw a double variable that was previously defined
+throw MyException("Fatal Error"); // throw an object of class MyException
+
+each statement signals that some problem occurred that must be handled
+
+throwing exceptions is only one part
+once the flag is thrown, what happens then?
+players stop playing because they know a flag was thrown
+in c++ we use try keyword to define a block of statements
+try block acts as an observer that looks for exceptions in the try block
+doesn't define how to handle the exception
+just tells the program to grab any exceptions that occur
+
+handling exceptions is the job of the catch block
+catch keyword is used to define a block of code that handles exceptions for a single data type
+try and catch blocks work together
+try detects exceptions, reroutes them to catch, where it's handled
+once it's sent to catch block it's considered handled and program resumes as normal
+catch parameters are like function parameters where the parameter is in the try block
+exceptions of fundamental types can be caught by value
+those of non-fundamental types should be caught by const reference to prevent making copies
+if the parameter won't be used, the variable name can be omitted
+catch (double) {
+	code here;
+}
+
+full program that uses throw, try, and multiple catch blocks
+
+EX: simple.cpp
+
+throw raised an exception with an int value of -1
+caught by enclosing throw block and sent to proper catch block
+once it was handled, program continued as normal
+
+exceptions are handled immediately
+statements after a thrown exception in the same try block won't be executed
+
+EX: immediate.cpp
+
+throw statement is first statement to be executed, causes exception of type double
+execution immediately moves to catch block
+the print statement in try block never executes
+
+example that's more practical
+
+EX: sqrt.cpp
+
+user is asked to enter number
+if they enter positive number no exception is thrown
+otherwise an exception of type const char* is thrown
+
+if exception is routed to catch block, it's considered handled even if catch block is empty
+we usually want our catch blocks to do something useful
+three common things that catch blocks do:
+print an error (to console or log file)
+return a value or error code back to caller
+may throw another exception
+	since catch block isn't in try block, it's handled by next enclosing try block

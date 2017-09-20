@@ -1,0 +1,95 @@
+appending is easy using operator+=, append(), or push_back()
+
+string& string::operator+=(const string& str)
+string& string::append(const string& str)
+	both append the characters of str
+	both return *this for chaining
+	both throw length_error if result exceeds max number of characters
+//string sString("one");
+//sString += string(" two");
+//string sThree(" three");
+//sString.append(sThree);
+//cout << sString << endl;
+Output:
+one two three
+
+another flavor of append() can append a substring
+
+string& string::append(const string& str, size_type index, size_type num)
+	appends num characters from str, starting at index
+	returns *this for chaining
+	throws out_of_range if index is out of bounds
+	throws length_error if result exceeds max number of characters
+//string sString("one ");
+//const string sTemp("twothreefour");
+//sString.append(sTemp, 3, 5); // append substring of sTemp starting at index 3 of length 5
+//cout << sString << endl;
+Output:
+one three
+
+operator+= and append() can work on c-style strings
+
+string& string::operator+=(const char* str)
+string& string::append(const char* str);
+	both functions append characters of str
+	both return *this for chaining
+	both throw length_error if result exceeds max number of chars
+	str should NOT be null
+//string sString("one");
+//sString += " two";
+//sString.append(" three");
+//cout << sString << endl;
+Output:
+one two three
+
+another flavor of append also works on c-style strings
+
+string& string::append(const char* str, size_type len)
+	appends first len characters of str
+	returns *this
+	throws length_error
+	ignores special characters (including ")
+	dangerous and not recommended
+//string sString("one");
+//sString.append("threefour", 5);
+//cout << sString << endl;
+Output:
+one three
+
+some functions also append characters
+name of non-operator to append char is push_back(), not append()
+
+string& string::operator+=(char c)
+void string::push_back(char c)
+	both append c
+	operator+= returns *this
+	both throw length_error if result exceeds max num of chars
+//string sString("one");
+//sString += ' ';
+//sString.push_back('2');
+//cout << sString << endl;
+Output:
+one 2
+
+function is called push_back(), not append()
+naming comes from stacks, where push_back() is to add single item to back of stack
+if strings are like stacks of chars, using push_back() makes sense
+
+there's still an append() for chars
+
+string& string::append(size_type num, char c)
+	adds num occurences of c
+	returns *this
+	throws length_error if results exceeds max num of chars
+//string sString("aaa");
+//sString.append(4, 'b');
+//cout << sString << endl;
+Output:
+aaabbb
+
+another flavor of append() uses iterators
+
+string& string::append(InputIterator start, InputIterator end)
+	appends all characters from [start, end)
+	returns *this
+	throws length_error exception if result exceeds max num of chars

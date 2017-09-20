@@ -1,0 +1,66 @@
+easiest way to assign a value to a string is using operator=
+there's also assign() that duplicates some of that functionality
+
+string& string::operator=(const string &str)
+string& string::assign(const string &str)
+string& string::operator=(const char* str)
+string& string::assign(const char* str)
+string& string::operator=(char c)
+	assign values of various types to the string
+	they return *this so they can be chained
+	no assign() function that takes single char
+
+EX: chainable.cpp
+
+assign() also comes in other flavors
+
+string& string::assign(const string &str, size_type index, size_type len)
+	assigns a substring of str, starting at index and of length len
+	throws out_of_range exception if index is out of bounds
+	returns *this so can be chained
+//const string sSource("abcdefg");
+//string sDest;
+//sDest.assign(sSource, 2, 4); // assign a substring of source from index 2 of length 4
+//cout << sDest << endl;
+Output:
+cdef
+
+string& string::assign(const char* chars, size_type len)
+	assigns len characters from the c-style array chars
+	throws length_error exception if result exceeds max number of characters
+	returns *this so can be chained
+	potentially dangerous, not recommended
+//string sDest;
+//sDest.assign("abcdefg", 4);
+//cout << sDest << endl;
+Output: abcd
+
+string& string::assign(size_type len, char c)
+	assign len occurrences of the char c
+	throws length_error exception if result exceeds max number of characters
+	returns *this so can be chained
+//string sDest;
+//sDest.assign(4, 'g');
+//cout << sDest << endl;
+Output:
+gggg
+
+can swap two strings using two flavors of swap()
+
+void string::swap(string& str)
+void swap(string& str1, string& str2)
+	both swap the value of two strings
+	member function swaps *this and str
+	global swaps str1 and str2
+	both are efficient, use instead of assignments for swapping
+//string sStr1("red");
+//string sStr2("blue");
+//cout << sStr1 << " " << sStr2 << endl;
+//swap(sStr1, sStr2);
+//cout << sStr1 << " " << sStr2 << endl;
+//sStr1.swap(sStr2);
+//cout << sStr1 << " " << sStr2 << endl;
+Output:
+red blue
+blue red
+red blue

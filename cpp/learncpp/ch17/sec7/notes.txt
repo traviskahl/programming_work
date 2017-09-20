@@ -1,0 +1,69 @@
+inserting can be done with insert()
+
+string& string::insert(size_type index, const string& str)
+string& string::insert(size_type index, const char* str)
+	both insert chars of string into the string at index
+	both return *this
+	both throw out_of_range if index is invalid
+	both functions throw a length_error exception if results exceeds max num chars
+	in c-style version, str must not be null
+//string sString("aaaa");
+//cout << sString << endl;
+//sString.insert(2, string("bbbb"));
+//cout << sString << endl;
+//sString.insert(4, "cccc");
+//cout << sString << endl;
+Output:
+aaaa
+aabbbbaa
+aabbccccbbaa
+
+INSANE version of insert() lets you insert a substring at an arbitrary index
+
+string& string::insert(size_type index, const string& str, size_type startindex, size_type num)
+	inserts num chars from str starting from startIndex into the string at index
+	returns *this
+	throws out_of_range if index or startindex is out of bounds
+	throws length_error if results exceeds max number of chars
+//string sString("aaaa");
+//const string sInsert("01234567");
+//sString.insert(2, sInsert, 3, 4); // insert substring of sInsert from index [3, 7) into sString at index 2
+//cout << sString << endl;
+Output:
+aa3456aa
+
+flavor of insert() that inserts first part of c-style string
+
+string& string::insert(size_type index, const char* str, size_type len)
+	inserts len characters of str into the string at index
+	returns *this
+	throws out_of_range
+	throws length_error
+	ignores special characters
+//string sString("aaaa");
+//sString.insert(2, "bcdef", 3);
+//cout << sString << endl;
+Output:
+aabcaa
+
+another flavor inserts the same character multiple times
+string& string::insert(size_type index, size_type num, char c)
+	inserts num instances of char c into the string at index
+	returns *this
+	throws out_of_range
+	throws length_error
+//string sString("aaaa");
+//sString.insert(2, 4, 'c');
+//cout << sString << endl;
+Output:
+aaccccaa
+
+insert() also has three versions that use iterators
+
+void insert(Iterator it, size_type num, char c)
+Iterator string::insert(Iterator it, char c)
+void string::insert(Iterator it, InputIterator begin, InputIterator end)
+	first inserts num instances of c before iterator it
+	second inserts a single character c before iterator it and returns an iterator to the position of the char inserted
+	third inserts all characters between [begin, end) before the iterator it
+	all throw length_error

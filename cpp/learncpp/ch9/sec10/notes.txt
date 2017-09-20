@@ -1,0 +1,38 @@
+c++ lets us convert one type to another
+it knows how to convert between built-in data types
+but not for any of our user defined classes
+so we can overload typecasts 
+this lets us convert our class into another data type
+
+remember the Cents class: just a wrapper for an int value
+provides some functions around that
+if we convert an int to Cents, shouldn't we be able to convert Cents to int?
+in this case it does
+
+if we have a function that takes an int value, we'd have to call getCents() to use it
+if we've written many functions we need to call getCents() many times
+instead of this, we can just overload the int typecast and convert a Cents directly to an int
+
+	operator int() { return m_cents; }
+
+two things to note:
+	to overload function that casts the class to an int, we write a new function in the class called operator int()
+		there's a space between the word operator and the type we're casting to
+	casting operators don't have a return type
+		c++ assumes we return the correct type
+
+EX: cents.cpp
+
+compiler notices that function printInt takes an int parameter
+also notices that variable cents isn't an int
+then it looks to see if we defined a typecast for Cents to int
+since we did, it calls operator int(), which returns an int, and that return value is passd to the function
+
+we can also explicitly cast a Cents variable to an int
+
+	Cents cents(7);
+	int c = static_cast<int>(cents);
+
+we can overload cast operators for any data type, including our own user defined classes
+
+EX: dollars.cpp

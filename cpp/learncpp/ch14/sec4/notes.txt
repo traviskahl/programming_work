@@ -1,0 +1,69 @@
+in past examples, there were cases where a function assumes its caller will handle an exception
+in the next example, mySqrt() assumes someone will handle its exception
+what happens if nobody does?
+
+EX: nocatch.cpp
+
+if user enters negative number, function throws an exception
+isn't handled in function, sent to calling function
+main() doesn't handle it, so it's terminated
+our program therefore is terminated
+
+when main() terminates with an unhandled exception, the OS tells you
+how it does depends on the operating system
+it could print an error message, pop up an error dialog, or just crash
+some OSes are less graceful than others
+in general we just want to avoid this
+
+here's the problem: functions can throw exception of any type
+if exception isn't caught, it delegates to the top of our program and crashes it
+it's possible to call functions of without knowledge of implementation or their possible exceptions
+how can we prevent this from happening?
+
+c++ gives us a mechanism to prevent this
+called a catch-all handler
+works just like a normal catch block, but uses ellipsis operator
+it represents an exception of any type
+
+EX: ellipsis.cpp
+
+since there's no specific catch block for type int, catch-all handler catches it instead
+should be placed last in catch block chain
+makes sure that exceptions are sent to the specific catch block if it exists
+some compilers enforce this: GCC does
+
+often it's left empty:
+catch(...) {}
+
+catches unanticipated exceptions and prevents them from unwinding the stack
+but doesn't do specific error handling
+
+one use for it is to wrap the contents of main()
+call all functions from within try block
+if any of them throw an exception that isn't caught, it eventually gets caught in main()
+prevents it from terminating, lets us print error and save user's state before exiting
+useful to catch and handle unanticipated problems
+
+exception specifiers exist, but aren't used much in practice
+not well supported by compilers, Soustrop considers them a failed experiment
+
+they're a mechanism that allows us to use a function declaration to specify whether a function might throw exceptions
+useful in determining if a function should be in a try block
+three types, all use the throw() syntax
+
+we can use an empty statement to denote the function throws no exceptions
+int doSomething() throw();
+it can still use exceptions, but they must be handled internally
+otherwise it's supposed to immediately terminate, but implementation may vary
+
+we can use a specific throw statement to denote the function might throw a specific type
+int doSomething() throw(double);
+
+can also use catch-all statement to denote it might throw an unspecified type
+int doSomething() throw(...);
+
+there's incomplete implementation depending on compiler
+they're more like statements of intent than guarantees
+some incompatability with template functions
+most c++ programmers don't even know they exist
+not recommended to use these
