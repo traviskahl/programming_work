@@ -1,0 +1,10 @@
+Lecture 5: IDEs
+
+Integrated Development Environment
+has tools to make programming easier
+	documentation
+	autocomplete
+	error highlighting
+	debugger
+	etc.
+

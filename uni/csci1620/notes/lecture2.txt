@@ -1,0 +1,56 @@
+Lecture 2: Object Oriented Programming part II
+
+object: actual "thing" in memory
+reference: way to access an object
+// Scanner input;
+What is input?
+	would be a reference to Scanner object
+	no "new" keyword, no object
+	
+a constructor of a class returns a reference to that object (no return type in definition)
+// input = null;
+sets reference to null, flags object for recollection
+Java has automatic garbage collection, automatically reclaims memory from unreferenced objects
+
+// SomeClass sc = new SomeClass(5);
+both sides need to be same type, here they need to be a reference to a SomeClass object
+// new SomeClass(5); // goes to the constructor of SomeClass and resolves to a reference
+
+keyword "this" is a special reference
+used in a non-static method, "this" refers to whatever object called the method
+a way for an object to refer directly to itself
+can be used for disambiguation or even calling upon a constructor from in another constructor
+/*
+TestClass(int primitiveDataMember, String referenceTypeDataMember) {
+	primitiveDataMember = primitiveDataMember; // this is a problem, goes to most local variable called primitiveDataMember
+	referenceTypeDataMember = referenceTypeDataMember // also a problem, does the same
+}
+*/
+
+/*
+TestClass(int pDM, String rTDM) {
+	this.pDM = pDM; // this now references the object itself
+	this.rTDM = rTDM; // same
+}
+*/
+
+assignment with reference types don't copy values like primitives
+// int x = 5;
+// int y = x;
+this copies the value of x and stores it in y
+// Object obj1 = new Object();
+// Object obj2 = obj1;
+the object isn't duplicated, obj2 is pointing at the same thing as obj1
+
+arrays of reference types
+arrays can access an arbitrary element quickly
+with primitives, all data in an array are next to each other in memory
+if we have an int array of 6 elements, Java allocates 24 bytes of spaces
+objects are different sizes, so they aren't next to each other
+references are all 8 bytes
+// TestClass[] tca = new TestClass[10];
+this creates an array of references, not objects
+the objects don't exist in memory at all
+// tca[0] = new TestClass();
+// tca[0].method();
+this works perfectly fine

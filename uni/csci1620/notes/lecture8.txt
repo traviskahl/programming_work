@@ -1,0 +1,53 @@
+// note: try String.format() for assignment
+Lecture 8: Polymorphism
+
+a technique used along with Inheritance
+allows multiple subclasses to be handled in the same way
+takes advantage of a common interface (usage) between different data types with same superclass
+allows one to program "in general" rather than specifically
+
+we have a base class Animal
+created to be superclass of other subclasses
+	Bird
+	Frog
+	Fish
+each of these Inherit from Animal
+each have the ability to move but does so differently (move() method)
+
+three types have a common link
+all Inherit from type Animal
+what type of object is an Animal reference able to refer to?
+anything that is-a Animal, so Animal and its subclasses
+// Animal a = new Bird();
+
+can create arrays of Animals with subclasses in it
+// Animal[] animals = new Animal[3];
+// animals[0] = new Bird();
+// animals[1] = new Frog();
+// animals[2] = new Fish();
+
+using this, can only calls methods in subclasses that are guaranteed to be there
+
+when calling methods, calls based on the type of object, not reference
+
+at compile time, look at type of reference
+at run time, look at type of object
+
+beginning of creating a common interface with different types
+allows us to collect information into a single structure that works in the same way
+even if the types of data are technically different
+
+sometimes want to program in the specific
+have the ability to determine in code what type a reference is
+// Employee e = new HourlyEmployee();
+// e.setWage(100);
+this doesn't compile, need to cast
+// ((HourlyEmployee)e).setWage();
+this compiles, could give a runtime error (ClassCastException)
+
+before downcasting, make sure cast will be legal at runtime
+can use instanceof
+use as ( Reference instanceof type )
+returns true if the reference refers to the type
+returns false otherwise
+

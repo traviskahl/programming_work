@@ -1,0 +1,2 @@
+Here's a line of output!
+Look, it's a number: 42

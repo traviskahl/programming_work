@@ -1,0 +1,44 @@
+Lecture 11: Exception Handling II
+
+all exceptions inherit from the Exception class
+Exception inherits from Throwable class
+only Throwable subclasses can be used in exception handling
+
+Errors inherit from Throwable
+occur from problems with the JVM and can't be recovered from
+	OutOfMemoryError, etc
+
+two types of exceptions: checked & unchecked
+most often are unchecked, all we've seen so far
+not required for these to be handled to compile
+all RuntimeExceptions and Errors are unchecked
+
+checked exception: must be handled
+if using a method COULD throw a checked exception, MUST write exception handling code
+mostly deal with file input & output
+user requests to open file that doesn't exists, etc
+easily anticipated
+
+exceptions that inherit from IOException are checked
+if a checked exception might happen, method must explicitly declare that it might throw or catch the exception
+done with the throws keyword
+catching will resolve the exception
+must be either caught or declared with throws
+
+a finally block can follow the last catch block in a try statement or the try block if no catch statements
+try statements need at least on catch block or only one finally block
+finally blocks always execute, even if an exception is thrown
+
+if an exception isn't caught in the block or method it was thrown, it can still be caught
+exception is passed through blocks and methods
+this is called stack unwinding
+
+printStackTrace(), getStackTrace(), and getMessage() are methods from the Throwable class
+can be used by every exception
+can be used for debugging
+
+assertions are ignored by regular execution
+let you raise an error based on a conditional statement
+run program using assertions: java -ea filename
+strictly for debugging
+// assert(conditional) : "Debug Message";

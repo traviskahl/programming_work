@@ -1,0 +1,50 @@
+Lecture 6: Inheritance Part I
+
+in larger projects, there might be multiple classes that are very similar
+can create larger class that other classes can "inherit" from
+larger is superclass, inheriter is subclass
+gives us consistency, ease of use, debugging, etc
+can reuse superclasses in other contexts
+opens up polymorphism that allows objects to be treated as its superclass
+
+a superclass contains all methods and members that are common to the subclasses
+subclass adds own methods and members to be unique
+also modify inherited methods to make it specialized
+
+can have multiple layers of inheritance
+circle inherits from 2dshape which inherits from shape, etc
+2dshape is direct superclass of circle
+shape is indirect superclass
+creates a class hierarchy
+java uses single inheritance
+doesn't support multiple inheritance, can't inherit from multiple direct superclasses
+
+is-a vs has-a
+inheritance defines what a class IS
+data members define what a class HAS
+
+subclasses can override methods from a superclass
+often done when a superclass defines a behavior and a subclass has a more specific implementation of the behavior
+
+all classes inherit from the Object class
+has no data members
+has 11 methods
+	can be called by any class, since they're subclasses
+	some can be overridden
+
+equals()
+	compares two objects
+	returns true if they're the exact same object in memory
+	should be overridden to compare to objects of the same type
+
+getClass()
+	returns object of type Class that has information about the object's class
+	// String x = "hello";
+	// System.ot.println(x.getClass().getName());
+	this returns java.lang.String
+	usually not overridden
+
+toString()
+	meant to be overridden
+	define how class should be output if used in context of a String
+	essentially display class information as text

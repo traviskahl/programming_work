@@ -1,0 +1,14 @@
+Lecture 16: Generics
+
+algorithms are very general, not tied to any data type
+generics let us use unknown types and pass them
+generics can only handle reference types
+primitive wrappers can bypass this
+Integer, Float, Double, Character, etc.
+
+compareTo() method lets us do >, <, ==, etc. on reference types
+ref1.compareTo(ref2);
+returns -1 if ref1 is < ref2
+returns 0 if equal
+returns 1 if ref1 is > ref2
+

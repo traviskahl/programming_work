@@ -1,0 +1,53 @@
+Lecture 17: LinkedList I
+
+data structures thus far have drawbacks to their power
+they are fixed-size data structures
+some space is often wasted
+enlarging array at runtime increases processing time
+
+
+dynamic data structure: size expands and contracts during execution as necesssary
+size is exact same as how many elements are contained
+no wasted space
+in this class, we look at:
+	linked list
+	stack
+	queue
+
+dynamic structures won't be implementable with an array in back end
+self referential class: has an instance variable that refers to another object of the same type
+instance of a self-referential class contains a data member with the same type as itself
+
+in context of dynamic data structures, known as nodes
+a wrapper for the type to be organized and other members for manipulation of data structure
+one dynamic data structure is made of multiple nodes, each containing needed element data
+also has a reference to another node, called a link, the next node in the structure
+
+dynamic data structures need dynamic memory allocation
+the ability to obtain more memory at execution time or release space not needed
+Java doesn't allow for explicit release of memory resources, handled by automatic garbage collection
+when an object isn't referenced, garbage collection gets it eventually
+
+only limit for dynamic memory allocation is how much memory you have available
+for programs without dynamic memory allocation, memory needed is known at compile time
+with dynamic memory allocation, OutOfMemoryError might be thrown
+	can catch this when creating nodes
+
+LinkedList
+simplest dynamic data structure
+most reflects the concept of an array or ArrayList
+order and placement are arbitrary
+any element can be removed or retrieved anytime
+
+linear collection of nodes
+program usually accesses a linked list with a reference to the first node
+	accesses each subsequent node via the link reference 
+dynamic: length can increase or decrease as you need
+is "full" only when all memory is taken up
+
+singly linked list: each node only contains one link
+doubly linked list: each node contains link to next and previous node
+java.util.LinkedList is doubly linked
+
+gives better memory utilization
+not contiguous in memory: have to go through entire list

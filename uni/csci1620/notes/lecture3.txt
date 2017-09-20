@@ -1,0 +1,44 @@
+Lecture 3: Decomposition
+
+decomposition: taking a larger, complex problem and breaking it into smaller, more manageable units
+it's usually helpful to break complex problems into smaller pieces
+less of a Java concept, more a code design concept
+easier to write, debug, and test code
+reusability
+
+in OOP languages, decomposition can occur at two levels
+1. multiple classes to solve the problem
+2. create small methods that each solve a part of the problem
+the classes should be focused AND general so they can be reused
+methods should be small and focused on doing a small, well-defined task
+
+EX: writing a program that completes a Caesar cipher
+more complex than we think
+break problem into smaller steps
+break those into even smaller steps if possible
+write UML
+with design done, where to start writing code?
+notice that some methods require other methods to work
+top-down vs. bottom-up design
+
+top-down is more linear and "feels" more natural
+but you assume that dependencies will work, so can't be tested until finished
+bottom-up you start with methods without dependencies
+can then be tested independently
+
+unit testing: testing small, individual parts of code
+create main() method for the class
+do this to access private data members
+
+// Character.isAlphabetic(char value) // returns boolean is the char is alphabetic
+
+// Character.toUpperCase(char value) // returns the char in upper case
+
+approach:
+1. break problem into small steps
+2. design classes that encapsulate the larger but focused reusable units
+3. for each class, design methods for each action
+4. create dependency charts
+5. write methods with no or completed dependencies
+6. test each method written individually
+

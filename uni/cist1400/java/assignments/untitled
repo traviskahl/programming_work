@@ -1,0 +1,8 @@
+
+
+											main
+					getSentences()			displayOriginal()			displayROT13()				displayCombinedROT13()
+																			  ||
+																		convertSentence()
+																		      ||
+																		charConvert()

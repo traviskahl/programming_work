@@ -1,0 +1,68 @@
+Lecture 22: Swing I
+
+Java contains package javax.swing that makes it easier to make GUIs
+	dialog boxes
+	text boxes
+	buttons
+	etc.
+
+JOPtionPane creates quick dialog boxes for simple input and output
+static methods for one-time use
+
+static String showInputDialog(Object)
+	displays input dialog box that is the passed Object's toString()
+	usually passed a String
+	has 2 buttons:
+		OK: returns the String that's been entered
+		Cancel: returns null, closes dialog box
+
+static void showMessageDialog(Component, Object, String, int)
+	displays a dialog box with message of Object's toString()
+		usually a string
+	title of box is String
+	int determines icon displayed in dialog box
+		are static data members
+			ERROR_MESSAGE
+			INFORMATION_MESSAGE
+			WARNING_MESSAGE
+			QUESTION_MESSAGE
+			PLAIN_MESSAGE
+	Component can place JOptionPane in a larger window
+	if null, defaults to own small window
+	both methods are overloaded to accept other options
+
+basic components:
+	JLabel
+		display text or icon
+	JTextField
+		get string input
+	JButton
+		triggers event when pressed
+	JCheckBox
+		select or deselect
+	JComboBox
+		drop down list
+	JList
+		list of items, can select multiple
+	JPanel
+		area for components to be organized
+
+JFrame: container, can put components into it
+create window and place components
+can be inherited by your own frame and customized
+	has everything you need to build a windowed GUI
+
+void setLayout(LayoutManager)
+	determine how added components will be layed out
+Component add(Component)
+	add component to frame, returns it
+void setSize(int, int)
+	set size of window to passed width and height
+void setVisible(boolean)
+	defaults to start out invisible
+void setDefaultCloseOperation(int)
+	what happens when window is closed
+		DO_NOTHING_ON_CLOSE
+		HIDE_ON_CLOSE
+		DISPOSE_ON_CLOSE
+		EXIT_ON_CLOSE

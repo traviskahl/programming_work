@@ -1,0 +1,38 @@
+Lecture 19 part I: Stacks
+
+stack: a restricted data structure
+only allowed a limited number of operations
+logical in nature
+even though data could be accessed arbitrarily, implementation of stack doesn't allow this
+restricted data structures are used to solve specific problems
+
+can only access elements from top
+data can only be added to and removed from the top
+known as Last In First Out (LIFO) data structure
+
+aside from constructors, only need two methods for a stack
+push() to add item to top
+pop() to remove item from top
+only two methods that can alter a stack
+
+other methods exist but don't affect the data itself
+isEmpty()
+lengthIs()
+search()
+peek() to return value at top without removing it
+
+limited in usage, but many problems are solved with stacks
+resolve method calls
+evaluate arithmetic expressions
+
+everything a stack does can be done by a linked list
+stack class can be written using what's been written in the linked list
+can use inheritance or composition
+
+stack.push() = ll.insertAtFront()
+stack.pop() = ll.removeFromFront()
+peek() can be done by get() the first item
+or, if no get() exists, pop() the item then push() it back on
+
+could also use composition
+Stack class has a LinkedList data member, so subclasses can't manipulate it

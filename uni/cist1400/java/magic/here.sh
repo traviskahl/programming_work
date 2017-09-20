@@ -1,0 +1,1 @@
+wget http://loki.ist.unomaha.edu/~rfulkerson/squarefiles.zip

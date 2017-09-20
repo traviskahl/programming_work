@@ -1,0 +1,93 @@
+Lecture 7: Inheritance part II
+
+all classes extend object
+some Object methods are meant to be overriden
+
+@Override
+overriding is when a subclass redefines a superclass' method
+@Override annotation is a safety mechanism to ensure overrides are done correctly
+marks the method as intending to override
+if no superclass method exists, causes compiler error
+
+toString() is commonly overridden
+	to override, the signature (name, return type, parameters) must be identical
+	otherwise it's not overriding, it's overloading
+
+Example: Employee, etc.
+Employee is set up to be a superclass
+has all aspects that are common to all kinds of employees
+based upon the Employee superclass we can create subclasses that Inherit Employee
+make more specific employee types HourlyEmployee and SalaryEmployee
+
+having subclasses invoke superclass methods
+if the 	method is unique a subclass can invoke a superclass method
+calls it as if it were its own
+if isn't unique, keyword super is used to explicitly invoke superclass method
+// super.toString();
+
+extends
+keyword extends in class declaration
+how inheritance is declared explicitly
+// public class B extends A {
+Class B inherits from A, gaining all properties and methods
+
+inheritance and constructors
+constructor of a subclass must call upon the superclass constructor
+subclass is combination of superclass and itself
+subclass constructor will initialize its unique data members, superclass members need initializing as well
+
+call to the superclass constructor must be first action in the subclass constructor
+can be done with the super keyword (similar to this)
+if superclass constructor isn't called upon, an empty constructor will be called implicitly
+	// super();
+
+default constructors
+if and only if a class doesn't declare a constructor a default one is created
+the default constructor doesn't do anything
+	no parameters
+	implicitly calls superclass constructor
+	primitives = 0; references = null
+
+what might happen if a subclass constructor implicitly calls upon a superclass empty constructor?
+might not exist
+if a constructor is declared in super, no default constructor is generated
+if there's no constructor that takes no params and subclass constructor attempts to implicitly execute super(), compiler error
+to be safe, always explicitly call upon superclass constructor
+
+notice the use of super
+	used to explicitly call the toString() method of the Employee superclass
+	used to call constructor of Employee
+
+not necessary to replicate the code of Employee's constructor as it was called upon
+if superclass' constructor is called in subclass' constructor (which it always should) superclass constructor must be called first
+
+protected
+subclasses don't have access to superclasses private members
+even if HourlyEmployee is an Employee, doesn't have access to private members or methods
+making superclass' members public would give subclass access to them, BUT
+this opens security problems as everything would have access
+
+there's a level of access between public and private
+protected, or # for UMLs
+data members and methods that are declared as protected can't be accessed arbitrarily
+protected members can be accessed by classes that inherit from it, and from other classes in the same package
+
+protected vs. package
+protected allows subclasses access even if they aren't in the same package
+now methods of subclasses have full, direct access to data members of superclass
+restriction of outside classes is still intact ensuring information security and integrity
+
+issues with protected
+in theory, allowing subclass access to superclass makes sense
+	a subclass IS-A instance of a superclass
+design-wise can be a problem
+allows access to protected members without set methods
+set methods are used to control what data can be set to
+
+implementation of subclasses should only depend on superclass services, not data implementation
+if data implementation in superclass is altered and subclasses directly access this data, subclass must be altered as well
+however, if the subclass only accesses superclass data through service methods, like set and get methods, subclass can stay unaltered
+
+declaring protected members doesn't only allow access to those members by subclasses, but all classes in the package
+even if the package is the default package
+in this case, may not be better than having the member declared as public

@@ -1,0 +1,50 @@
+Lecture 9: Abstract
+
+in employee example, no reason to create an instance of Employee
+only function to serve as a superclass
+animal example: no reason to create just an Animal
+
+abstract classes: designed to never have an instance
+only purpose is to be a superclass
+can still have data members and full methods
+can also have abstract methods: no implementation
+
+concrete classes: opposite of abstract class
+all classes done so far are concrete
+can have instance
+have all methods implemented
+
+to declare class as abstract, use abstract keyword after access specifier
+rest is same as before
+same goes for declaring an abstract class
+// public abstract double doSomething(); // like function prototypes in c++
+
+can create references, so polymorphism works
+// Employee e // this works
+// Employee e = new Employee(...) // doesn't work
+
+need to override inherited abstract methods
+gives compiler error otherwise
+
+final keyword
+variable or data member declared as final can't be changed after it's set
+also used in Inheritance
+method declared as final can't be overridden
+private methods are final by default
+class declared final can't be Inherited from
+
+interface
+similar to abstract class
+also can't be instantiated
+used to create a common usability between classes that must be able to do the same things
+	another way to program in general
+provides no specifics
+any data members are static and final
+all methods are public and abstract
+
+can be used when unrelated classes need to share methods / constants
+allows polymorphism between classes that aren't related through Inheritance
+can be used for tagging, interface is empty but used as a label
+
+in definition of concrete class, put extends first
+if it implements multiple interfaces, separate with commas

@@ -1,0 +1,10 @@
+ActionEvent: heard by ActionListener:
+	JButton
+	JTextField
+
+ItemEvent: heard by ItemListener:
+	JCheckBox
+	JRadioButton
+
+KeyEvent: heard by KeyListener:
+	keyboard events

@@ -1,0 +1,41 @@
+Lecture 1: Object-Oriented Programming part I
+
+data type: describes a piece of data
+class: more complex data type than primitive data types
+data types that are defined by Classes are known as Reference types
+	these are handled slightly differently than primitive types
+
+reference types are similar to primitives
+a class isn't a piece of data, but defines the characteristics of the data
+
+a piece of data created based on a class def. is an object
+	can also be called instance of that class
+	object is a specific realization of the class
+
+classes define two major things
+	1. what the data type stores - data members
+	2. what the data type does - member methods
+		constructor falls under here
+
+static members belong to the class itself, not an instance
+
+object is actually created and takes up memory
+each instance holds its own copies of defined data members and can call non-static methods
+an object is created with the keyword "new" (except String)
+// new TestClass(5, "Some String");
+
+references allow us to access an object
+it's a handle / label for an object that exists in memory
+created like primitive variables, giving the type of the reference followed by name
+// TestClass var;
+
+// TestClass var = new TestClass(5, "Some String");
+right side creates an instance of TestClass
+left side creates a reference capable of pointing to the object
+assignment assigns the reference to the new object
+
+objects can be accessed through reference by using the dot operator
+// var.memberMethod();
+dot operator means I want to access the object that var references, calling the memberMethod() method
+
+ 

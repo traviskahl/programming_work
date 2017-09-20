@@ -1,0 +1,23 @@
+Lecture 21: Files part II
+
+can serialize objects, write an entire object to a file
+object must implement Serializable
+all data members must be Serializable
+all primitives and arrays are Serializable
+some reference types are, check definitions
+serialized objects are stored in .ser files
+
+can label data member transient
+will be skipped in serialization
+becomes null reference
+
+ObjectOutputStream class does serialization and writes to files
+takes FileOutputStream class as a parameter
+// output = new ObjectOutputStream(new FileOutputStream("filename.ser"));
+// output.writeObject(objectName);
+// output.close(); // need to close it as well
+
+ObjectInputStream class gets serialized inputs and deserializes it
+takes FileInputStream class
+// input.readObject(); // get an object, returns an Object, need to cast
+throws EOFException when no objects are left, can use to stop reading

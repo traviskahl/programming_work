@@ -1,0 +1,49 @@
+Lecture 14: Sorting and Searching
+
+important to be able to find data and sort it
+many different algorithms that solve the problem
+some are easier to implement
+others are more efficient
+less efficient but easier to use might be worth it if only small data sets are used
+
+most algorithms work with any data type
+
+linear search is most straight forward, least efficient
+take a set of data, start at beginning and go entire way through
+
+binary search is more efficient, more complex
+data must be sorted to work
+is extra time sorting worth the efficiency of a more efficient search?
+does data need to be sorted anyway?
+efficiency isn't the only question in choosing an algorithm
+
+number of comparisons required is first power of 2 greater than the number of elements
+1023 (2^10 - 1) elements, 10 checks
+64 (2^6) elements, 7 checks
+to search an array of size n, takes log(n) iterations
+linear search takes n iterations
+most sort algorithms take n^2 iterations
+
+many ways to sort values
+each give the same result, difference being amount of resources that are used and ease of implementation
+
+selection sort is easy to understand, not efficient
+for first iteration, smallest element is swapped with first element
+second will find second smallest and place in second element
+and so on
+eff = n-1 + n-2 + n-3 ... + 3 + 2 + 1
+do algebra, eff = (n^2 - n) / 2
+as n increases, n^2 is more significant, efficiency is said to be n^2
+
+insertion sort is also simple and inefficient
+keeps first part of data sorted, each iteration sorting next element into data
+like sorting a deck of cards
+takes at best n iterations and at worst n^2 iterations
+
+merge sort uses recursion
+split array into two smaller subarrays, sort those
+merge them
+subarrays are also split and merged
+and so on, base case is array of size 1
+efficiency of n * log(n), which is < n^2
+takes more memory, less time

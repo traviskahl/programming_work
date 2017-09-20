@@ -1,0 +1,55 @@
+Lecture 13: Recursion II
+
+common problem is string pattern matching
+does a substring exist in another string?
+EX: search in "abracadabra"
+"cada" exists, but "abrc" doesn't
+
+brute force technique: generate all substrings in the search string
+check each one against the original substring char by char
+takes more and more time as the substrings get longer
+
+Rabin-Karp method is used for string pattern matching
+given a string to search and a substring, it finds the first occurrence of the substring
+converts the substring into a number (hashing!)
+substrings of the same size in the search are also hashed
+if a match is found, returns the location
+
+need a method to represent a sequence of chars as a number
+all chars in our char space can be given a number value
+A - 0
+B - 1
+etc...
+Z - 25
+
+could sum all char's numerical values into one number
+however, leads to hashes that aren't unique
+"abcd" and "dcba" are the same, but strings aren't equal
+
+best hashes produce unique values
+can do this if we know what characters are in both search and substring
+
+order of chars is important
+think about number systems
+
+"ABCD" hashes into 0x26^3 + 1x26^2 + 2x26^1 + 3x26^0 // base 26 because 26 letters
+or 731
+"AABCD" hashes into the same, so not entirely unique, but isn't the same length
+it is unique compared to other 4 character strings
+
+values of the previous hash can be used to find the next
+search string "ABCDE"
+find the hashes of all substrings of size 3:
+"ABC"
+"BCD"
+"CDE"
+
+can get second hash "BCD" from first hash "ABC" this way:
+1. subtract value that 'A' increased the hash by
+2. multiply what remains by 26
+	this to increase the powers of the common characters
+3. add value of new character
+
+becomes more efficient as string size increases
+
+hash(pos) = base x (hash(pos - 1) - prevChar) + newChar

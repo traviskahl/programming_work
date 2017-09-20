@@ -1,0 +1,51 @@
+Lecture 4: Packages
+
+allow for better organization of classes
+large projects can't have all classes in same directory
+also make classes more reusable
+
+packages allow us to make "libraries" of classes
+packages are made of related classes
+util package has:
+	Scanner
+	Vector
+	Timer
+	etc...
+
+individual classes can be imported
+or multiple can be used with *
+this only loads classes that are used
+
+declare reusable class:
+	create public class
+		each file only has one public class
+		others have no access specifier and have package access
+	first executable line must be package declaration
+	// package packageName.testPackage;
+	declares class as member of a package and determines where .class file will go when compiled
+	from current dir goes to ./packageName/testPackage
+
+.class file must end up in package dir
+where is .java in the structure?
+	1. project source dir
+		advantage: all source code in one place
+	2. package directory
+		advantage: better organization with source and class in same location
+		usually preferred approach
+
+if .java files are in source dir, compile with
+// javac -d . packageClass.java
+if they're in the package dirs, compile source code that has main()
+	this compiles dependencies into their current locations
+
+two classes from different packages can have the same name
+you need to use fully qualified name
+
+during loading when finding classes in packages if the package isn't found in the SDK it goes to $CLASSPATH
+tells compiler where to find other packages
+add a dir to classpath with // javac -cp /path/to/package
+also add dir to classpath when you execute
+
+variables, methods, or classes declared without an access specifier have package access
+only other classes in the same package can access them
+

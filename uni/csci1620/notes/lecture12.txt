@@ -1,0 +1,30 @@
+Lecture 12: Recursion I
+
+possible for methods to call upon themselves
+can be used to break a problem into smaller problems
+
+method that calls itself: recursive
+can be done directly or through another method
+	method A calls B which calls A
+	still considered recursive
+
+is possible for the calling of methods to never end
+recursive approach requires the problem to be approached in a certain way
+problem needs to be broken down into two different types of cases
+	1. base cases: answer is known
+	2. general cases: answer is not known
+
+base case is the stopping point for recursion
+
+recursive algorithm: a solution that is expressed in terms of:
+	a. smaller instances of itself
+	b. a base case
+
+if (condition for which answer is known)
+	solution statement, return known answer // base case
+
+else // general case
+	recursive method call, break down the problem, return answer
+
+can quickly take up memory, grows exponentially
+big problem is that the same calls are being made several times (fibonacci example)

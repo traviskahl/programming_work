@@ -1,0 +1,37 @@
+Lecture 15: ArrayList
+
+data structure: logical structure that can be used to store and organize data
+typically same type
+different data structures organize data in different ways and provide the appropriate methods to manipulate data unique to structure
+
+array is simplest data structure
+can store data
+manipulate individual pieces of data
+get length of array, etc
+
+can't natively sort, search, remove, add, swap, etc
+need to write our own code
+size can't be changed either
+
+ArrayList is essentially an array
+gives us ability to manipulate data through member methods
+easy interface for common array manipulations
+can be either a sorted or unsorted list
+
+public class ArrayList {
+	private int[] list;
+	private int numElements;
+	// methods here
+}
+
+list: group of related items with a linear relationship
+linear relationship: each element except first has a unique predecessor, each element except last has unique successor
+
+data members: the array itself, number of elements, original size, default and maximum sizes which are final
+public methods: constructor with size parameter, add item, remove item, find item, get length, clear the array, etc.
+private method: enlarge
+makes array larger when it's full
+called by addItem
+private since user shouldn't be able to arbitrarily increase size, only needed when array's full
+
+problem: can only hold one type of data, need to rewrite for another data type

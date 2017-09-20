@@ -1,0 +1,106 @@
+Lecture 20: Files part I
+
+storage of data in variables and data structures is temporary
+when program ends, data is lost
+
+for long-term use and reuse program, need to create a separate file to store data
+when program is run again, can read data back from file and pick up where it left off
+files are persistent data, as it exists beyond the duration of the program
+
+computer processes data as sets of 0s and 1s
+	called bits, smallest type of data
+bits in sets of 8 represent more complex data
+	called a byte
+all numbers can be represented with bits in binary
+
+as humans, easier to deal with symbolic types
+	decimal digits 0-9
+	letters a-z
+	special symbols %, $, *, etc.
+	all of these combined make up characters
+
+even these characters need to be represented in bits for computers to deal with them
+two standards for numerical representation
+	ASCII (1 byte)
+	unicode (2 bytes)
+
+fields are composed of bytes or characters
+fields are groups of bytes or characters than convey meaning
+a field consisting of upper and lower case letters could represent a person's name
+
+combining fields creates a record
+an Employee record might have:
+	employee number
+	name
+	hourly rate
+	hours worked
+
+multiple records makes a file
+usually a particular field in a record is chosen as a record key
+should be unique, so records can be differentiated for searching and sorting
+
+a stream is a linear, sequentially ordered series of bytes
+System.in and System.out are both streams
+by default system.in reads from keyboard input and system.out outputs to the console
+both can be redirected to read from or write to files
+
+java provides a third stream System.err
+also outputs to the screen, can be redirected
+meant to report errors to a log file
+redirecting of these streams can be done with methods setIn(), setOut(), setErr()
+
+two types of file streams
+byte based streams store data in binary
+	binary files: created from byte based streams, read by a program that converts data to human readable or meaningful format
+data represents whatever we want it to
+could be ints, chars, shorts, or anything
+to properly interpret it, must know what it was supposed to be
+
+character based streams store data as characters
+	text files: created from character based streams, can be read by text editors
+file isn't formatted differently, still a series of bytes
+if it's opened with a character based stream, all data is assumed to be characters, will be read in as such
+
+java.io classes
+	FileInputStream and FileOutputStream: byte based i/o
+	FileReader and FileWriter: character based i/o
+	ObjectInputStream and ObjectOutputStream: input and output of objects or variables
+	File: useful for getting info about files and directories
+
+java.util classes
+	Scanner: easily read data from a file
+	Formatter: easily write data to a file
+
+file object is used to represent a file in a java program
+not capable of reading or writing to the file it represents
+used along with other classes
+
+public File(String name)
+	takes the name of a file
+	could take path information
+	can be relative or absolute
+File file = new File("text.txt")
+
+public File(String pathToName, String name)
+	path is kept separate
+	useful if multiple files in same directory are being manipulated
+
+public File(File directory, String name)
+	File class can represent a directory or a specific file
+
+java imposes no structure on a file
+programmer must structure files
+Formatter class can be used to open a text file for writing
+	pass name of file to constructor
+	if file doesn't exist, create it
+	if file does exist, truncate contents
+	use method format() to write formatted text to file
+		similar to printf() method
+	use close() to close Formatter object
+
+import Formatter object and possible exceptions
+java.util.Formatter;
+java.io.FileNotFoundException;
+java.lang.SecurityException; if file doesn't have permissions
+java.util.FormatterClosedException; attempting to write to a file that's been closed
+

@@ -1,0 +1,42 @@
+Lecture 10: Exception Handling I
+
+two types of errors
+compile time errors, easy to find and fix
+run time errors
+	happen when something unwanted happens
+	known as Exceptions
+
+exception output is called the stack trace
+specific line is called the throw point
+
+not always possible to stop exceptions from occurring
+possible for forsee and handle exceptions
+
+exceptions are classes
+when an exception is thrown, it's throwing objects
+
+to handle an exception, must be declared where the exception might occur
+do this with a try block
+// try { doSomething(); }
+
+a catch block determines what exception should be caught and what to do with it
+multiple exceptions can be handled with one try block
+
+try {
+	// code here
+}
+catch(InputMismatchException IME) {
+	// what to do if exception happens
+}
+
+can have multiple catch blocks for one try blocks
+use System.err stream for printing errors, will always print
+
+exceptions inherit from the Exception class
+can catch a general Exception
+
+when an exception is thrown in a try block, nothing else is done
+checks catch blocks and executes appropriate one
+if there isn't one, program crashes and prints stack trace
+
+try block + catch block + finally block (sometimes) make a try statement

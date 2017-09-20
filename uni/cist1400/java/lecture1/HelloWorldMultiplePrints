@@ -1,0 +1,10 @@
+// output one line of text using two output statements
+
+public class HelloWorldMultipleOutputs {
+    public static void main(String args[])
+    {
+        System.out.print("Hello");
+        System.out.print
+    }
+
+}

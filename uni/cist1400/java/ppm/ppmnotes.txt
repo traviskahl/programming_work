@@ -1,0 +1,17 @@
+line 1: magic number: P3 for this assignment
+		color, RGB triplets
+line 2:	columns x rows
+		3 2		means 2 rows, 3 columns
+		1080p would be 1080 rows, 1920 columns
+line 3:	max value for each triplet value
+		255 in this case
+all next lines are in RGB triplet order
+
+0
+255
+0
+
+means 0 R, 255 G, 0 B, so the color is green
+
+255 255 0
+means 255 R & G, 0 B, so the color is yellow
