@@ -1,0 +1,19 @@
+enable ethernet
+	% systemctl enable dhcpcd@eth0.service
+	% systemctl start dhcpcd@eth0.service
+
+add user to system
+	% useradd -m -G wheel travis
+	% passwd travis
+
+edit sudoers file
+	% pacman -S sudo
+	% EDITOR=vim visudo
+	(vim) travis	ALL=(ALL) ALL
+
+enable color and x86 repo in pacman.conf
+	% vim /etc/pacman.conf
+
+sync repositories and reboot
+	% pacman -Sy
+	% reboot

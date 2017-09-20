@@ -1,0 +1,17 @@
+enable wifi
+
+ip link
+iw dev (interface) scan | less
+https://wiki.archlinux.org/index.php/Wireless_network_configuration#Device_driver
+
+get xorg working
+
+https://bbs.archlinux.org/viewtopic.php?id=224101
+https://www.howtoforge.com/tutorial/arch-linux-lxde-desktop/
+
+mouses:
+	Name="HID 04b4:4009"
+	Handlers=kbd event2 mouse0
+
+	Name="SynPS/2 Synaptics TouchPad"
+	Handlers=event10 mouse1

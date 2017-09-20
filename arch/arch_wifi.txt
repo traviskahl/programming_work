@@ -1,0 +1,15 @@
+start by installing drivers
+then find interface name
+	% ip link
+should start with a 'w'
+now turn it on
+	% sudo ip link set (interfacename) up
+let's edit our /etc/wpa_supplicant/wpa_supplicant-(interfacename).conf
+	ctrl_interface=/run/wpa_passphrase
+	update_config=1
+now add our network to this file
+	% sudo wpa_passphrase "SSID" "passphrase" >> /etc/wpa_supplicant/wpa_supplicant-(interfacename).conf
+enable wpa_supplicant and dhcpcd@(interfacename)
+	% sudo systemctl enable wpa_supplicant@(interfacename)
+	% sudo systemctl enable dhcpcd@(interfacename)
+reboot and enjoy

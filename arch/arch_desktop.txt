@@ -1,0 +1,26 @@
+log in as travis and use sudo
+install default video driver
+	% pacman -S xf86-video-vesa
+
+install opengl support
+	% pacman -S mesa
+
+install intel drivers
+	% pacman -S xf86-video-intel lib32-mesa-libgl
+
+install xorg
+	% pacman -S xorg-server xorg-utils xorg-xinit
+
+install desktop environment
+	% pacman -S lxde
+
+install login manager
+	% pacman -S lightdm-gtk-greeter
+	% systemctl enable lightdm.service
+
+unmute master volume
+	% pacman -S alsa-utils
+	% amixer sset Master unmute
+
+reboot pc
+	% reboot

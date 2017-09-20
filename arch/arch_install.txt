@@ -1,0 +1,91 @@
+set keyboard layout
+	% loadkeys us
+
+update system clock
+	% timedatectl set-ntp true
+
+partition disks
+	% parted /dev/sda
+	(parted) mklabel msdos
+	(parted) mkpart primary ext4 1MiB 100%
+	(parted) set 1 boot on
+	(parted) quit
+
+format partitions
+	% mkfs.ext4 /dev/sda1
+
+mount filesystem
+	% mount /dev/sda1 /mnt
+
+install base packages
+	% pacstrap /mnt base base-devel
+
+generate fstab
+	% genfstab -U /mnt >> /mnt/etc/fstab
+
+change root
+	% arch-chroot /mnt
+
+install vim for text editing
+	% pacman -S vim	
+
+set time zone
+	% ln -sf /usr/share/zoneinfo/America/Chicaco /etc/localtime
+	% hwclock --systohc
+
+generate locales
+	% vim /etc/locale.gen
+	(vim) en_US.UTF-8 UTF-8
+	% locale-gen
+
+set LANG in locale.conf
+	% vim /etc/locale.conf
+	(vim) LANG=en_US.UTF-8
+
+make keyboard layout permament
+	% vim /etc/vconsole.conf
+	(vim) KEYMAP=us
+
+make hostname file
+	% vim /etc/hostname
+	(vim) jim
+
+add hostname to hosts
+	% vim /etc/hosts
+	(vim) 127.0.1.1 jim.localhost jim
+
+install network stuff
+	install packages for networking
+		% pacman -S iw wpa_supplicant
+	install firmware
+		install needed packages
+			% pacman -S make gcc wget
+		install b43-fwcutter
+			% cd /tmp
+			% wget http://bues.ch/b43/fwcutter/b43-fwcutter-018.tar.bz2
+			% tar xjf b43-fwcutter-018.tar.bz2
+			% cd b43-fwcutter-018
+			% make
+			% make install
+			% cd ..
+		install driver
+			% export FIRMWARE_INSTALL_DIR="/lib/firmware"
+			% wget http://www.lwfinger.com/b43-firmware/broadcom-wl-5.100.138.tar.bz2
+			% tar xjf broadcom-wl-5.100.138.tar.bz2
+			% b43-fwcutter -w "$FIRMWARE_INSTALL_DIR" broadcom-wl-5.100.138/linux/wl_apsta.o
+
+set password
+	% passwd
+
+install bootloader (grub)
+	% pacman -S grub intel-ucode
+	% grub-install --target=i386-pc /dev/sda
+	% grub-mkconfig -o /boot/grub/grub.cfg
+
+exit chroot
+	% exit
+
+restart machine
+	% reboot
+
+if this doesn't work, you're screwed
