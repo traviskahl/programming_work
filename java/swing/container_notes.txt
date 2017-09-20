@@ -1,0 +1,33 @@
+Component class is the abstract base class for every non menu ui element
+represents an object with graphical representation
+
+declaration:
+	public abstract class Component
+		extends Object
+			implements ImageObserver, MenuContainer, Serializable
+
+fields:
+	static float BOTTOM_ALIGNMENT
+		constant for getAlignmentY
+
+	static float CENTER_ALIGNMENT
+		constant for getAlignmentX and getAlignmentY
+
+	static float LEFT_ALIGNMENT
+		constant for getAlignmentX
+
+	static float RIGHT_ALIGNMENT
+		constant for getAlignmentX
+
+	static float TOP_ALIGNMENT
+		constant for getAlignmentY
+
+constructors:
+	protected Component()
+		creates a new Component
+
+methods:
+	too many
+
+inherited methods:
+	java.lang.Object

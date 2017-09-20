@@ -1,0 +1,100 @@
+JColorChooser lets the user manipulate and select a color
+
+declaration:
+	public class JColorChooser
+		extends JComponent
+			implements Accessible
+
+fields:
+	protected AccessibleContext accessibleContext
+
+	static String CHOOSER_PANELS_PROPERTY
+		chooserPanel array property name
+
+	static String PREVIEW_PANEL_PROPERTY
+		preview panel property name
+
+	static String SELECTION_MODEL_PROPERTY
+		selection model property name
+
+constructors:
+	JColorChooser()
+		creates a color chooser pane with an initial color of white
+
+	JColorChooser(Color color)
+		creates a color chooser pane with the specified initial color
+
+	JColorChooser(ColorSelectionModel model)
+		creates with a specified ColorSelectionModel
+
+methods:
+	void addChooserPanel(AbstractColorChooserPanel panel)
+		adds a color chooser panel to the chooser
+
+	static JDialog createDialog(Component c, String title, boolean modal, JColorChooser chooserPane, ActionListener okListener, ActionListener cancelListener)
+		creates and returns a new dialog with the specified ColorChooser pane with "OK", "Cancel", and "Reset" buttons
+
+	AccessibleContext getAccessibleContext()	
+		gets the accessibleContext data member
+
+	AbstractColorChooserPanel[] getChooserPanels()
+		returns the specified color panels
+
+	Color getColor()
+		gets the current color value from the color chooser
+
+	boolean getDragEnabled()
+		gets the value of dragEnabled property
+
+	JComponent getPreviewPanel()
+		returns the preview panel that shows a chosen color
+
+	ColorSelectionModel getSelectionModel()
+		returns the data model that handles color selections
+
+	ColorChooserUI getUI()
+		returns the L&F object that renders this
+
+	protected String paramString()
+		returns a String representation of this
+
+	AbstractColorChooserPanel removeChooserPanel(AbstractColorChooserPanel panel)
+		removes the panel
+
+	void setChooserPanels(AbstractColorChooserPanels[] panels)
+		specifies the color panels used to choose a color value
+
+	void setColor(Color color)
+		sets the current color to the passed color
+
+	void setColor(int c)
+		sets the current color to the passed color
+
+	void setColor(int r, int g, int b)
+		sets the current color to the passed rgb value
+
+	void setDragEnabled(boolean b)
+		sets dragEnabled property which enabled drag and drop
+
+	void setPreviewPanel(JComponent preview)
+		sets the preview panel
+
+	void setSelectionMode(ColorSelectionModel newModel)
+		sets the model containing the selected color
+
+	void setUI(ColorChooserUI ui)
+		sets the L&F object that renders this
+
+	static Color showDialog(Component component, String title, Color initialColor)
+		shows a modal color-chooser dialog and blocks
+
+	void updateUI()
+		notification from the UIManager that the L&F has changed
+
+inherited methods:
+	javax.swing.JComponent
+	java.awt.Container
+	java.awt.Component
+	java.lang.Object
+
+example: JColorChooserExample.java

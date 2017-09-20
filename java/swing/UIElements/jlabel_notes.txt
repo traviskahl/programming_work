@@ -1,0 +1,130 @@
+JLabel
+	
+can display either text, image, or both
+contents are aligned by setting vertical and horizontal alignment
+default is vertically centered
+text only labels are leading edge aligned
+image only are horizontally aligned
+
+declaration:
+	public class JLabel
+		extends JComponent
+			implements SwingConstants, Accessible
+
+fields:
+	protected Component labelFor
+
+constructors:
+	JLabel()
+		creates an instance with no image and empty string for title
+	JLabel(Icon image)
+		creates an instance with the specified image
+	JLabel(Icon image, int horizontalAlignment)
+		creates instance with image and horizontal alignment
+	JLabel(String text)
+		creates instance with specified text
+	JLabel(String text, Icon image, int horizontalAlignment)
+		creates instance with specified text, image, and horizontal alignment
+	JLabel(String text, int horizontalAlignment)
+
+methods:
+	protected int checkHorizontalKey(int key, String message)
+		verify the key is a legal value for the horizontalAlignment value
+
+	protected int checkVerticalKey(int key, String message)
+		verify the key is a legal value for verticalAlignment value
+
+	AccessibleContext getAccessibleContext() ???
+		get the AccessibleContext of this object
+
+	Icon getDisabledIcon()
+		returns the icon when the label is disabled
+
+	int getDisplayedMnemonic() ???
+		get the keycode that indicates a mnemonic key
+
+	int getHorizontalAlignment()
+		returns the alignment across the x-axis
+
+	int getHorizontalTextPosition()
+		returns the horizontal position of the text relative to the image
+
+	Icon getIcon()
+		returns the graphic image of the label
+
+	int getIconTextGap()
+		return the amount of space between the text and icon
+
+	Component getLabelFor()
+		get the component this is labelling
+
+	String getText()
+		return the String the label is displaying
+
+	LabelUI getUI() ???
+		returns the L&F object that renders this component
+
+	String getUIClassID() ???
+		returns a String that specifies the name of the L&F class that renders the component
+
+	int getVerticalAlignment()
+		returns the alignment across the y-axis
+
+	int getVerticalTextPosition()
+		returns the vertical position of the text relative to the image
+
+	boolean imageUpdate(Image img, int infoflags, int x, int y, int w, int h)
+		overridden to return false if the current Icon's image isn't equal to the passed Image
+
+	protected String paramString()
+		returns a string representation of the Label
+
+	void setDisabledIcon(Icon disabledIcon)
+		sets the icon to be displayed if the label is "disabled" through JLabel.setEnabled(false)
+
+	void setDisplayedMnemonic(char aChar) ???
+		specifies the displayedMnemonic as a char
+
+	void setDisplayedMnemonic(int key) ???
+		specifies a keycode that indicates a mnemonic key
+
+	void setDisplayedMnemonicIndex(int index) ???
+		provides a hint to the look and feel as to which character in the text should be decorated to represent the mnemonic
+
+	void setHorizontalAlignment(int alignment)
+		sets the alignment across the x-axis
+
+	void setHorizontalTextPoistion()
+		sets the horizontal position of the text relative to the image
+
+	void setIcon(Icon icon)
+		set the image to be displayed
+
+	void setIconTextGap(int iconTextGap)
+		if both icon and text are set, defines the space between them
+
+	void setLabelFor(Component c)
+		sets the component this is labelling
+
+	void setText(String text)
+		defines the single line this object displays
+
+	void setUI(LabelUI ui) ???
+		sets the L&F object that renders this object
+
+	void setVerticalAlignment(int alignment)
+		sets the alignment along the y-axis
+
+	void setVerticalTextPosition(int textPosition)
+		sets the vertical position of the text relative to the image
+
+	void updateUI() ???
+		resets the UI property to a value from the current look and feel
+
+inherited methods:
+	javax.swing.JComponent
+	java.awt.Container
+	java.awt.Component
+	java.lang.Object
+
+Example: JLabelExample.java

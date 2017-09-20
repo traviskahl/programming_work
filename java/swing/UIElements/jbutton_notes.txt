@@ -1,0 +1,60 @@
+JButton is a push button
+has a label, generates an event when pressed
+can also have image
+
+declaration:
+	public class JButton
+		extends AbstractButton
+			implements Accessible
+
+constructors:
+	JButton()
+		creates a button with no set text or icon
+
+	JButton(Action a) ???
+		creates a button where properties are taken from the Action
+
+	JButton(Icon icon)
+		creates a button with an icon
+
+	JButton(String text)
+		creates a button with the text
+
+	JButton(String text, Icon icon)
+		creates a button with initial text and icon
+
+methods:
+	AccessibleContext getAccessibleContext() ???
+		gets the AccessibleContext associated with the JButton
+
+	String getUIClassID() ???
+		returns a string of the name of the L&F class that renders it
+
+	boolean isDefaultButton() ???
+		gets the value of the defaultButton property
+			if true, it's the default button for its JRootPane
+
+	boolean isDefaultCapable()
+		gets the value of the defaultCapable property
+
+	protected String paramString()
+		returns a String representation of the button
+
+	void removeNotify() ???
+		overrides JComponent.removeNotify to check if button is default for its JRootPane
+			if so, sets the RootPane's default button to null
+
+	void setDefaultCapable(boolean defaultCapable)
+		sets defaultCapable property which determines if it can be the default button
+
+	void updateUI() ???
+		resets the UI property to a value from the current look and feel
+
+inherited methods:
+	javax.swing.AbstractButton
+	javax.swing.JComponent
+	java.awt.Container
+	java.awt.Component
+	java.lang.Object
+
+example: JButtonExample.java

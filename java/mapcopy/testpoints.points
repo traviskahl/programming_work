@@ -1,0 +1,6 @@
+subworlds:
+oldNorthWorlds:
+seeds:
+name:village,x:-767,z:794,y:4,enabled:true,red:0.0,green:1.0,blue:0.0,suffix:house,world:,dimensions:-1#0#1#
+name:arcania tower,x:-813,z:837,y:30,enabled:true,red:0.047058824,green:0.050980393,blue:0.63529414,suffix:,world:,dimensions:0#1#
+name:Latest Death,x:-1272,z:680,y:58,enabled:true,red:1.0,green:1.0,blue:1.0,suffix:skull,world:,dimensions:-1#
