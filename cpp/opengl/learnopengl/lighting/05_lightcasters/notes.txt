@@ -1,0 +1,16 @@
+all lighting so far has been from one source
+in reality we have multiple that act differently
+light source that casts light onto objects is called a light caster
+there's a few different types
+
+when a light source is far away the light rays are almost parallel to each other
+when a light source is infinitely far away it's a directional light
+because all light rays have the same direction
+for example, the sun
+not really infinitely far away, but might as well be
+all light rays are parallel
+
+since they're parallel doesn't matter how an object relates to the source's position
+since direction stays the same, calculations will be similar for each object
+model one by defining a light direction vector instead of a position vector
+should negate it because it's traveling towards an object, not away from
