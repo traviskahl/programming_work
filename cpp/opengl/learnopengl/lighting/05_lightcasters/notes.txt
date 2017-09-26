@@ -14,3 +14,83 @@ since they're parallel doesn't matter how an object relates to the source's posi
 since direction stays the same, calculations will be similar for each object
 model one by defining a light direction vector instead of a position vector
 should negate it because it's traveling towards an object, not away from
+
+directional lights are good for global lights
+but usually we also want several point lights in our scene
+point light: light source with a given position that illuminates in all directions
+light rays fade out over distance
+like light bulbs or torches
+
+in our previous examples we used a kind of point light
+but now we want it to simulate light fading over distance
+reducing intensity of light over distance is called attenuation
+we could use a linear equation, but it usually looks fake
+brightness diminishes quickly at the start and then more slowly over more distance
+so we need a different formula
+we can use this one:
+
+	F = 1.0 / Kc + Kl*d + + Kq*d*d
+
+d represents distance from fragment to light source
+then we define three terms: constant Kc, linear Kl, quadratic Kq
+constant usually kept at 1.0 to make sure denominator is never smaller than 1
+then it'd boost intensity at distance, which doesn't make sense
+linear is multiplied by distance, reduces intensity with distance
+quadratic is multiplied by quadrant of distance, sets quadratic decrease of intensity
+less significant when distance is small, more as distance grows
+
+what do we set these values to?
+depends on several factors
+	environment
+	distance we want light to cover
+	type of light
+most of the time it takes experience and some tweaking
+there's some resources like Ogre3D's wiki that give some good starting points
+
+we need 3 extra values in fragment shader
+C, L, and Q in the formula
+best stored in our Light struct
+then set them in our main program
+then calculate attenuation and multiply 3 parts of Phong model by it
+
+last type of light is a spotlight
+light source located somewhere that shoots light in a specific direction
+only objects in a certain radius are lit and everything else is dark
+like a street light or a flashlight
+in opengl, defined by a world-space position, direction, and cutoff angle that specifies radius of spotlight
+for each fragment we calculate if it's in the cutoff and light it accordingly
+
+LightDir: vector pointing from fragment to light source
+SpotDir: direction the spotlight is pointing at
+Phi: cutoff angle that specifies the radius
+	everything outside isn't lit
+Theta: angle between LightDir and SpotDir
+	if theta's smaller than phi, the fragment's in the spotlight
+
+we should calculate the dot product (cosine of angles between unit vectors) between LightDir and SpotDir
+compare it to cutoff angle
+we'll create a flashlight
+
+flashlight: spotlight located at viewer's position, usually aimed straight ahead
+normal spotlight, but position and direction always updated based on player's position
+for fragment shader, we need spotlight's position vector, direction vector, and cutoff angle
+
+still looks a bit fake at this point, spotlight has hard edges
+there's no fade, fragments just get turned off or on
+a realistic spotlight will reduce light gradually at edges
+
+we need to simulate it having an inner and outer cone
+inner cone is the cone we have
+outer cone is an angle between spotlight's direction vector and outer cone's vector(radius)
+if fragment is between inner and outer cone it should calculate intensity between 0.0 and 1.0
+if fragment if in inner cone it's equal to 1.0
+outside of both cones it's 0.0
+
+we can use this equation:
+
+	(theta - outerCutOff) / epsilon
+
+theta is theta from before
+outerCutOff is the cutoff of the outer cone
+epsilon is cosine difference between inner and outer cone
+we can clamp values to 0.0 and 1.0
