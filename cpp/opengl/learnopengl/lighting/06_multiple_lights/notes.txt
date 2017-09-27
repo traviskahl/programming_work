@@ -1,0 +1,27 @@
+we've learned a lot about lighting
+phong models, materials, lighting maps, and light casters
+now we'll combine it all by creating a scene with multiple lights
+we'll have 4 point lights, a sun-like light, and a flashlight
+
+to use more than one light we'll need to use functions in glsl
+code gets goofy when we want to lighting calculations with multiple lights
+light requires different computations, it's just not great
+
+functions in glsl are just like in C
+function name, return type, and might need a prototype
+we'll have different functions for each type of light: directional, point, and spotlight
+
+with multiple lights the approach is generally the same
+one color vector that represents fragment's output color
+for each light the light's contribution color is added to the fragment
+so we'll calculate each individual contribution, then add them up
+
+we want a function specifically for directional light
+we need to set variables for calculating this, then pass them to function
+store them in a struct and instantiate one as a uniform
+then just do in a function what we did in main() before
+
+then with point lights we should define a function that does the same
+include attenuation!
+have another struct for this
+in this case we also used a preprocessor directive
