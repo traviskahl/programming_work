@@ -1,0 +1,46 @@
+so far we've just used a cube for everything
+it's cool but in reality we need more than just one cube
+we'll have complicated models
+but we can't define all the vertices and colors ourselves
+we want to import the models from a program like blender or maya
+those programs let artists create shapes and apply textures using uv-mapping
+then they generate the vertex coords, normals, and texture coords and export them to a model file
+
+we need a way to parse these files and translate them into something opengl understands
+but there's many different formats to store them in
+Wavefront.obj contains minimal amounts of data
+Collada files contain lots of information, sometimes too much for us
+to import multiple we'd need an importer for each different format
+fortunately there's libraries like assimp to do this for us
+
+once assimp imports a model it loads it data structures
+they're all part of a "scene"
+that scene object contains all the data of the model
+then has a collection of nodes with indices of data stored in the scene
+each node can have any number of children
+
+all data of model is contained in the Scene object
+	all materials, meshes, etc. are in there
+	also has a reference to the root node
+Root node might have child nodes and set of indices that point to mesh data
+	root node's mMeshes[] contains Mesh objects
+	values in mMeshes[] of a node are indices for the scene's meshes array
+Mesh object contains info needed for rendering
+	vertex positions, normal vectors, texture coords, faces, and the material of the object
+mesh has several faces
+	Face: primitive render of the object (triangles, squares, points)
+	face has indices of the vertices that make a primitive
+	vertices and indices are separated, makes it easy to use an index buffer
+mesh also has a Material object
+	has several functions to retrieve material properties
+	colors, texture maps, etc.
+
+we want to load a Scene, retrieve Meshes from nodes recursively
+process each Mesh to retrieve vertex data, indices, and material properties
+then we have a collection of mesh data that has one model
+
+models in reality aren't a single shape
+each model usually has several sub-models
+each separate shape is called a mesh
+think of a human: artists model the head, limbs, clothes, tools, etc. separately
+then combine them into one big final model
