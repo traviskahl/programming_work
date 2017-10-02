@@ -1,0 +1,50 @@
+assimp loads textures into its own format
+but that's different from what opengl needs
+so we should turn that data into a format opengl can use
+
+what should a single mesh have?
+needs AT LEAST a set of vertices
+each vertex should have a vector for position, normal, and texture coordinate
+mesh also needs indices for indexed drawing and material data for textures
+
+we can define a vertex struct:
+
+	struct Vertex {
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec2 TexCoords;
+	};
+
+we also want a Texture struct
+
+	struct Texture {
+		unsigned int id;
+		string type;
+	}
+can store id of texture and its type (diffuse, specular)
+
+then we can define the structure of a mesh class
+initialize buffers in setupMesh() and draw mesh with Draw()
+pass a shader to Draw() so we can set uniforms before drawing
+
+now we have a large amount of mesh data but need to set up buffers
+specify vertex shader layout with vertex attribute pointers
+code is pretty straightforward, but uses structs now as well
+structs are neat because their memory layout is sequential
+so we can pass a pointer to a list of Vertex structs to glBufferData()
+sizeof() can also be used
+another use is the preprocessor directive offsetof()
+first arg is a struct, second is a variable name for the struct
+returns byte offset of that variable from the start of the struct
+great for defining offset parameter for glVertexAttribPointer()
+
+finally we need to complete Draw()
+we want to bind textures before calling glDrawElements()
+difficult because we don't know exactly how many textures the mesh has
+we're going to use this naming convention:
+	diffuse textures are named texture_diffuseN
+	specular textures are texture_specularN
+	N is a number from 1 to the max number of texture samplers allowed
+we can define as many texture samplers as we want in shaders
+if a mesh needs it, we know what the name is
+we can process any amount of textures on a single mesh and the developer can use as many as they want
