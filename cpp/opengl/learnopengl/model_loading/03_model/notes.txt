@@ -1,0 +1,92 @@
+now we want to create a class that represents an entire model
+it should be able to have multiple meshes, each with potentially multiple objects
+we should load it into assimp, then translate to mesh objects
+
+contains a vector of Meshes and requires a file location for the constructor
+loads the file immediately
+has private functions that cover part of assimp's import procedure
+
+we need to include assimp's headers
+so compiler doesn't yell at us
+
+first we need to call loadModel from the constructor
+from there we use assimp to load the model into a scene object
+that's how assimp stores everything
+when we have that we can access every piece of data
+assimp does this with two lines of code
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+first, declare an Importer from assimp and call its ReadFile function
+expects a file path and some post-processing options
+aiProcess_Triangulate tells assimp that if the file doesn't have only triangles, then the primitives should be made triangles
+aiProcess_FlipUVs flips texture coords on y-axis when needed
+some other options:
+	aiProcess_GenNormals: creates normals for each vertex if model doesn't have them
+	aiProcess_SplitLargeMeshes: splits large meshes into smaller ones
+								useful if rendering has a max number of vertices
+	aiProcess_OptimizeMeshes: tries to join smaller meshes into one large mesh
+
+loading is easy with assimp
+the hard part is using the scene object to translate the data into our meshes
+
+after loading model we check to see if the scene and root node are not null
+also check a flag to see if returned data is incomplete
+if there were errors, we report the error and return
+
+otherwise we process the scene's nodes, so pass the root node to recursive processNode()
+write the function recursively because it fits a recursive structure
+exit condition is when all nodes were processed
+
+we technically could process nodes and loop through scene's meshes directly
+but we want to work with indices because it defines a parent-child relationship
+we can define meshes as parents of other meshes
+we might want to translate a car mesh and make its children (like a steering wheel, tires, etc) translated as well
+right now we aren't using it, but in the future we might want it
+
+translating an aiMesh to one of our meshes isn't too difficult
+we should access relevant properties and store them in our own object
+three sections: retrieve vertex data, retrieve mesh's indices, retrieve material data
+data is stored in a vector and then a Mesh is created and returned to caller
+
+retrieving vertex data is simple
+define vertex struct that we add to the vertices array
+loop for as many vertices as there are in the mesh
+then fill the struct with relevant data
+same process for normals
+almost the same for texture coords, but assimp lets models have up to 8 texture coords per vertex
+we also want to make sure that texture coords exist
+do this entire process for each vertex
+
+assimp defines each mesh as having a set of faces
+each face is one primitive, which for us is triangles
+a face has the indices that define which vertices we should draw
+so we just iterate over each face and store its vertices
+
+meshes only contain an index to a material object
+to retrieve the actual material for a mesh we should index the scene's mMaterials array
+material index is set there so we can check if it actually exists
+first retrieve aiMaterial object then load mesh's diffuse/specular textures
+material objects store arrays of texture locations for each texture type
+use a helper function to retrieve texture from the material
+returns a vector of Texture structs
+
+loadMaterialTextures() iterates over texture locations of given type and retrieves the file location
+then loads and generates texture and stores it in a Vertex struct
+first check amount of textures stored in the material
+use GetTextureCount() for this
+then use TextureFromFile() to load a texture and return the ID
+then we're pretty good
+
+but we want to add one large optimization
+most scenes reuse textures in several meshes
+loading textures isn't easy so we should reuse them when possible
+we're going to store the loaded textures globally
+when we want to load a texture we'll see if it's been loaded already
+if it has we'll just reuse it
+we need to store their path as well
+and store them in a vector at the top of the Model class
+in loadMaterialTextures we want to compare the texture path with the textures we already loaded
+if it's loaded we skip it
+
