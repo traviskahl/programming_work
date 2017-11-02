@@ -1,0 +1,8 @@
+Order Name: Test Name
+2017/10/30 19:26:15
+
+companyName,11110,kitName,stocking,1
+companyName,11111,kitName,stocking,2
+companyName,11112,kitName,stocking,3
+companyName,11113,kitName,stocking,4
+companyName,11114,kitName,stocking,5

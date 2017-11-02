@@ -1,4 +1,5 @@
 #!/bin/bash
 
-echo $1
-echo $1+1
+for i in $@; do
+	echo $i
+done
