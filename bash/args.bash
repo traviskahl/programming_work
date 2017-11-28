@@ -1,5 +1,7 @@
 #!/bin/bash
 
-for i in $@; do
-	echo $i
-done
+function print_output {
+	echo $1 $2
+}
+
+print_output "on" "dhcpcd"
