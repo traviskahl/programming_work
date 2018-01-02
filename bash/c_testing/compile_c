@@ -1,17 +1,58 @@
 #!/bin/bash
-# this program is just for easy compilation of GNU C++ programs using my custom settings.
-# last updated on 10 July, 2017
+# this program is just for quick compilation of GNU C/C++ programs using my custom settings.
+# last updated on 7 December, 2017
 
-filename=$1
-shorter=${filename%.cpp}
+#filename=$1
+#shorter=${filename%.cpp}
 
+#for i in "$@"; do
+	#files+=$i
+	#files+=" "
+#done
+
+#if g++ -Wall -std=c++17 $files -o $shorter; then
+	#echo "$filename was compiled into $shorter"
+#else
+	#echo "compilation failed."
+#fi
+
+ERROR_FLAGS="-Wall -Wextra"
+
+if [[ -z $1 ]]; then
+	echo "No source file found"
+	exit 1
+fi
+
+# we should get the source file first
+SOURCE_FILE="$1"
+
+# next we should find the output file
+# we get the extension from this as well, so we can do it here rather than later
+EXTENSION="${SOURCE_FILE##*.}"
+OUTPUT_FILE="${SOURCE_FILE%.*}.o"
+
+# now determine the compiler
+case $EXTENSION in
+	c)		COMPILER="gcc"	
+			STD_FLAG="-std=c11"
+			;;
+	cpp)	COMPILER="c++"
+			STD_FLAG="-std=c++17"
+			;;
+	*)		echo "Invalid source file"
+			exit 1
+			;;
+esac
+
+# finally, get all our input files
 for i in "$@"; do
-	files+=$i
-	files+=" "
+	INPUT_FILES+="$i "
 done
 
-if g++ -Wall -std=c++17 $files -o $shorter; then
-	echo "$filename was compiled into $shorter"
+if $COMPILER $STD_FLAG $ERROR_FLAGS $INPUT_FILES -o $OUTPUT_FILE; then
+	echo "Files compiled into $OUTPUT_FILE"
+	exit 0;
 else
-	echo "compilation failed."
+	echo "Compilation failed"
+	exit 1;
 fi

@@ -1,0 +1,24 @@
+network={
+	ssid="Newsong Family"
+	#psk="fluffy123"
+	psk=e984e7052924debe9b4e3f0314fa5cc77b77bdb05b704e352406618f19202b8a
+}
+
+network={
+	ssid="wifi2344"
+	#psk="letang3t"
+	psk=2626129f00f51b3142d42bd6905215046112ab872818cbb1cb750ac96fd672f9
+}
+
+network={
+	ssid="wifi2344"
+	#psk="letang3t"
+	psk=2626129f00f51b3142d42bd6905215046112ab872818cbb1cb750ac96fd672f9
+}
+
+network={
+	ssid="wifi2344"
+	#psk="letang3t"
+	psk=2626129f00f51b3142d42bd6905215046112ab872818cbb1cb750ac96fd672f9
+}
+

@@ -1,0 +1,72 @@
+in the coord systems we've rendered a 3d container and used a depth buffer
+to prevent faces rendering in the front if they're behind other objects
+now we'll elaborate on depth values it's storing and how it determines what to cut
+
+the depth buffer stores information on fragments and has the same height and width as the color buffer
+automatically created by the window system, stores depth values as 16, 24, or 32-bit floats
+most use 24
+
+when it's enabled opengl tests the depth value of a fragment against the content of the depth buffer
+if it passes the buffer is updated with the new value
+if it fails the fragment is discarded
+
+done in screen space after fragment shader is run (also after stencil testing)
+space coords relate directly to the viewport given by glViewport()
+can be accessed with gl_FragCoord in fragment shader
+also has a z component, the actual depth value
+that's what's compared to the depth buffer
+
+we need to enable depth testing
+
+	glEnable(GL_DEPTH_TEST);
+
+we also should clear it every rendition
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+we might someday want to do a depth test but not update the buffer
+it's called a read-only depth buffer
+opengl lets us do this by setting depth mask
+
+	glDepthMask(GL_FALSE);
+
+can modify comparison operators used in depth test
+control when it should pass or discard fragments, update buffer
+
+	glDepthFunc(GL_LESS);
+
+accepts several operators
+
+	GL_ALWAYS		never passes
+	GL_NEVER		always passes
+	GL_LESS
+	GL_EQUAL
+	GL_LEQUAL
+	GL_GREATER
+	GL_NOTEQUAL
+	GL_GEQUAL
+
+GL_LESS is the default, discards all fragments that have depth value higher or equal to current value
+
+depth buffer has values between 0.0 and 1.0
+compares its content with z-values of objects in scene
+these z-values can be any value between the near and far values of projection frustrum
+so, we need to transform the viewspace values to [0, 1]
+we can use a linear equation like
+
+	depth = (z - near) / (far - near)
+
+but a linear depth buffer like this isn't usually used
+a non-linear depth equation that's proportional to 1 / z is mostly used
+gives us great precision when z is small and less when it's far away
+think: do we want depth values at 1000 to have same precision as those as 1?
+linear equation doesn't account for this
+
+	depth = ((1/z) - (1/near)) / ((1/far) - (1/near))
+
+values in depth buffer aren't linear in screen space
+but they are in view space before projection matrix is applied
+this equation is embedded in the projection matrix
+when we transform vertex coords it's done
+the effect of this is apparent once we try visualizing the depth buffer
+
